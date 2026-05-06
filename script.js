@@ -1,4 +1,4 @@
-const PROXY_URL = "https://your-worker.your-subdomain.workers.dev/?url=";
+const PROXY_URL = "https://scribd.ashishmeena2055.workers.dev/?url=";
 
 async function supersonicDownload(scribdUrl) {
     const docId = scribdUrl.match(/\/document\/(\d+)\//)[1];
@@ -10,7 +10,7 @@ async function supersonicDownload(scribdUrl) {
     // Parallel Fetching: Saare pages ek saath
     const pagePromises = Array.from({ length: totalPages }, (_, i) => {
         const imgUrl = `https://html.scribdassets.com/${docId}/pages/page-${i + 1}.jsonp`;
-        return fetch(PROXY_URL + encodeURIComponent(imgUrl)).then(r => r.text());
+        return fetch(https://scribd.ashishmeena2055.workers.dev/ + encodeURIComponent(imgUrl)).then(r => r.text());
     });
 
     const results = await Promise.all(pagePromises);
