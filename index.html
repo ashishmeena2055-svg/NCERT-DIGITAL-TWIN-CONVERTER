@@ -4,7 +4,7 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width,initial-scale=1.0">
 
-<title>NCERT Hindi PDF Cloner Engine</title>
+<title>NCERT AI Hindi PDF Cloner PRO</title>
 
 <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap" rel="stylesheet">
 
@@ -25,8 +25,8 @@ box-sizing:border-box;
 body{
 background:#050505;
 font-family:'Poppins',sans-serif;
-color:white;
 overflow:hidden;
+color:white;
 }
 
 .app{
@@ -36,12 +36,12 @@ width:100%;
 }
 
 .sidebar{
-width:340px;
+width:350px;
 background:rgba(255,255,255,0.04);
 border-right:1px solid rgba(255,255,255,0.08);
-backdrop-filter:blur(20px);
 padding:22px;
 overflow:auto;
+backdrop-filter:blur(20px);
 }
 
 .main{
@@ -70,12 +70,12 @@ background:linear-gradient(90deg,#ff0050,#10b981);
 }
 
 .section{
-margin-bottom:25px;
+margin-bottom:24px;
 }
 
 .section h3{
-font-size:14px;
 margin-bottom:12px;
+font-size:14px;
 color:#ff0050;
 }
 
@@ -94,11 +94,11 @@ width:100%;
 padding:15px;
 border:none;
 border-radius:16px;
-background:linear-gradient(90deg,#ff0050,#ff3366);
-color:white;
 font-weight:700;
 cursor:pointer;
 margin-top:12px;
+background:linear-gradient(90deg,#ff0050,#ff3366);
+color:white;
 transition:0.3s;
 }
 
@@ -108,7 +108,39 @@ box-shadow:0 10px 30px rgba(255,0,80,0.3);
 }
 
 .secondary{
-background:linear-gradient(90deg,#10b981,#0fd78f);
+background:linear-gradient(90deg,#10b981,#00d58f);
+}
+
+.metric-grid{
+display:grid;
+grid-template-columns:1fr 1fr;
+gap:10px;
+}
+
+.metric{
+background:rgba(255,255,255,0.05);
+padding:15px;
+border-radius:16px;
+}
+
+.metric h2{
+margin-top:8px;
+}
+
+.progress{
+height:10px;
+width:100%;
+border-radius:999px;
+overflow:hidden;
+background:rgba(255,255,255,0.05);
+margin-top:15px;
+}
+
+.progress-inner{
+height:100%;
+width:0%;
+background:linear-gradient(90deg,#ff0050,#10b981);
+transition:0.4s;
 }
 
 .panel-grid{
@@ -148,6 +180,7 @@ padding:12px;
 border-radius:12px;
 margin-bottom:10px;
 background:rgba(255,255,255,0.05);
+word-break:break-word;
 }
 
 .green{
@@ -168,43 +201,11 @@ border:1px solid rgba(255,166,0,0.2);
 .preview{
 height:320px;
 margin:0 18px 18px;
-background:rgba(255,255,255,0.04);
 border-radius:24px;
 border:1px solid rgba(255,255,255,0.08);
+background:rgba(255,255,255,0.04);
 overflow:auto;
 padding:20px;
-}
-
-.metric-grid{
-display:grid;
-grid-template-columns:1fr 1fr;
-gap:10px;
-}
-
-.metric{
-background:rgba(255,255,255,0.05);
-padding:16px;
-border-radius:16px;
-}
-
-.metric h2{
-margin-top:8px;
-}
-
-.progress{
-width:100%;
-height:10px;
-border-radius:999px;
-background:rgba(255,255,255,0.05);
-overflow:hidden;
-margin-top:15px;
-}
-
-.progress-inner{
-height:100%;
-width:0%;
-background:linear-gradient(90deg,#ff0050,#10b981);
-transition:0.4s;
 }
 
 canvas{
@@ -215,7 +216,8 @@ border-radius:12px;
 .small{
 font-size:12px;
 color:#aaa;
-margin-top:10px;
+margin-top:8px;
+line-height:1.5;
 }
 
 </style>
@@ -234,19 +236,20 @@ margin-top:10px;
 <input type="file" id="pdfInput" accept=".pdf">
 
 <div class="small">
-Upload NCERT / NEET English PDF
+Supports NCERT / NEET / ALLEN / Physics / Chemistry / Biology books.
 </div>
 
 </div>
 
 <div class="section">
 
-<h3>Upload Hindi Unicode Font (.ttf)</h3>
+<h3>Upload Unicode Hindi Font</h3>
 
-<input type="file" id="fontInput" accept=".ttf">
+<input type="file" id="fontInput" accept=".ttf,.otf">
 
 <div class="small">
-Use NotoSansDevanagari-Regular.ttf
+Recommended:
+NotoSansDevanagari-Regular.ttf
 </div>
 
 </div>
@@ -254,7 +257,7 @@ Use NotoSansDevanagari-Regular.ttf
 <div class="section">
 
 <button id="startBtn">
-Start Hindi Conversion
+Start AI Hindi Conversion
 </button>
 
 <button class="secondary" id="downloadBtn" disabled>
@@ -280,13 +283,13 @@ Download Hindi PDF
 </div>
 
 <div class="metric">
-<div>Chunks</div>
-<h2 id="chunkCount">0</h2>
+<div>Tokens</div>
+<h2 id="tokenCount">0</h2>
 </div>
 
 <div class="metric">
-<div>Tokens</div>
-<h2 id="tokenCount">0</h2>
+<div>Chunks</div>
+<h2 id="chunkCount">0</h2>
 </div>
 
 </div>
@@ -304,11 +307,11 @@ Download Hindi PDF
 <div class="header">
 
 <div class="brand">
-NCERT Hindi PDF Cloner
+NCERT Hindi PDF Cloner PRO
 </div>
 
 <div>
-Unicode Rendering Engine
+Unicode Safe Rendering Engine
 </div>
 
 </div>
@@ -353,7 +356,7 @@ pdfjsLib.GlobalWorkerOptions.workerSrc =
 const {
 PDFDocument,
 rgb
-} = PDFLib;
+}=PDFLib;
 
 const pdfInput=document.getElementById('pdfInput');
 const fontInput=document.getElementById('fontInput');
@@ -364,32 +367,33 @@ const downloadBtn=document.getElementById('downloadBtn');
 const englishStream=document.getElementById('englishStream');
 const hindiStream=document.getElementById('hindiStream');
 
-const pageCountEl=document.getElementById('pageCount');
+const pageCount=document.getElementById('pageCount');
 const statusText=document.getElementById('statusText');
-const chunkCountEl=document.getElementById('chunkCount');
-const tokenCountEl=document.getElementById('tokenCount');
+const tokenCount=document.getElementById('tokenCount');
+const chunkCount=document.getElementById('chunkCount');
+
 const progressBar=document.getElementById('progressBar');
 
 const previewWrap=document.getElementById('previewWrap');
 
 let finalBlob=null;
 
-const scientificDictionary={
+const dictionary={
 
+"Alcohol":"अल्कोहल [Alcohol]",
+"Phenol":"फिनॉल [Phenol]",
+"Ether":"ईथर [Ether]",
+"Hydroxy":"हाइड्रॉक्सी [Hydroxy]",
+"Reaction":"अभिक्रिया [Reaction]",
+"Oxidation":"ऑक्सीकरण [Oxidation]",
+"Reduction":"अपचयन [Reduction]",
+"Hydrogen":"हाइड्रोजन [Hydrogen]",
 "Metabolism":"चयापचय [Metabolism]",
 "Fermentation":"किण्वन [Fermentation]",
 "Xylem":"जाइलम [Xylem]",
 "Phloem":"फ्लोएम [Phloem]",
 "Bryophytes":"ब्रायोफाइट्स [Bryophytes]",
-"Protonema":"प्रोटोनिमा [Protonema]",
-"Alcohol":"अल्कोहल [Alcohol]",
-"Phenol":"फिनोल [Phenol]",
-"Ether":"ईथर [Ether]",
-"Hydroxy":"हाइड्रॉक्सी [Hydroxy]",
-"Oxidation":"ऑक्सीकरण [Oxidation]",
-"Reduction":"अपचयन [Reduction]",
-"Hydrogen":"हाइड्रोजन [Hydrogen]",
-"Reaction":"अभिक्रिया [Reaction]"
+"Protonema":"प्रोटोनिमा [Protonema]"
 
 };
 
@@ -411,57 +415,23 @@ progressBar.style.width=v+'%';
 
 }
 
-function splitChunks(text,size=1400){
+function translate(text){
 
-const words=text.split(' ');
+let out=text;
 
-const chunks=[];
-
-let current='';
-
-for(const word of words){
-
-if((current+word).length>size){
-
-chunks.push(current);
-
-current=word+' ';
-
-}else{
-
-current+=word+' ';
-
-}
-
-}
-
-if(current.trim()){
-
-chunks.push(current);
-
-}
-
-return chunks;
-
-}
-
-function translateScientific(text){
-
-let output=text;
-
-for(const key in scientificDictionary){
+for(const key in dictionary){
 
 const regex=new RegExp(key,'gi');
 
-output=output.replace(regex,scientificDictionary[key]);
+out=out.replace(regex,dictionary[key]);
 
 }
 
-output=output.replace(/Que\.\s*(\d+)/g,'प्रश्न $1');
+out=out.replace(/Que\.\s*(\d+)/g,'प्रश्न $1');
 
-output=output.replace(/\((\d+)\)/g,'($1)');
+out=out.replace(/\((\d+)\)/g,'($1)');
 
-return output;
+return out;
 
 }
 
@@ -493,7 +463,6 @@ async function processPDF(){
 try{
 
 const pdfFile=pdfInput.files[0];
-
 const fontFile=fontInput.files[0];
 
 if(!pdfFile){
@@ -506,7 +475,7 @@ return;
 
 if(!fontFile){
 
-alert('Upload Hindi TTF Font');
+alert('Upload Unicode Hindi Font');
 
 return;
 
@@ -514,10 +483,10 @@ return;
 
 startBtn.disabled=true;
 
-statusText.innerText='Loading';
-
 englishStream.innerHTML='';
 hindiStream.innerHTML='';
+
+statusText.innerText='Loading';
 
 const pdfBytes=await pdfFile.arrayBuffer();
 
@@ -525,26 +494,31 @@ const pdf=await pdfjsLib.getDocument({
 data:pdfBytes
 }).promise;
 
-pageCountEl.innerText=pdf.numPages;
+pageCount.innerText=pdf.numPages;
 
-const newPdf=await PDFDocument.create();
+const outputPdf=await PDFDocument.create();
 
-newPdf.registerFontkit(fontkit);
+outputPdf.registerFontkit(fontkit);
 
 const fontBytes=await fontFile.arrayBuffer();
 
-const hindiFont=await newPdf.embedFont(fontBytes);
+const unicodeFont=await outputPdf.embedFont(
+fontBytes,
+{
+subset:false
+}
+);
 
-let totalChunks=0;
 let totalTokens=0;
+let totalChunks=0;
 
-for(let pageNum=1;pageNum<=pdf.numPages;pageNum++){
+for(let p=1;p<=pdf.numPages;p++){
 
-statusText.innerText=`Page ${pageNum}`;
+statusText.innerText=`Page ${p}`;
 
-const page=await pdf.getPage(pageNum);
+const page=await pdf.getPage(p);
 
-if(pageNum===1){
+if(p===1){
 
 await renderPreview(page);
 
@@ -552,124 +526,134 @@ await renderPreview(page);
 
 const viewport=page.getViewport({scale:2});
 
-const textContent=await page.getTextContent();
+const canvas=document.createElement('canvas');
 
-const items=textContent.items;
+const ctx=canvas.getContext('2d');
 
-let fullText='';
-
-items.forEach(item=>{
-
-fullText+=item.str+' ';
-
-});
-
-totalTokens+=fullText.length;
-
-tokenCountEl.innerText=totalTokens;
-
-log(
-englishStream,
-`Page ${pageNum} Extracted`
-);
-
-const translated=translateScientific(fullText);
-
-const chunks=splitChunks(translated);
-
-totalChunks+=chunks.length;
-
-chunkCountEl.innerText=totalChunks;
-
-const renderCanvas=document.createElement('canvas');
-
-const ctx=renderCanvas.getContext('2d');
-
-renderCanvas.width=viewport.width;
-
-renderCanvas.height=viewport.height;
+canvas.width=viewport.width;
+canvas.height=viewport.height;
 
 await page.render({
 canvasContext:ctx,
 viewport
 }).promise;
 
-const imgData=renderCanvas.toDataURL('image/jpeg',1.0);
+const imgData=canvas.toDataURL('image/jpeg',1);
 
-const jpgImage=await newPdf.embedJpg(imgData);
+const jpg=await outputPdf.embedJpg(imgData);
 
-const pdfPage=newPdf.addPage([
+const pdfPage=outputPdf.addPage([
 viewport.width,
 viewport.height
 ]);
 
-pdfPage.drawImage(jpgImage,{
+pdfPage.drawImage(jpg,{
 x:0,
 y:0,
 width:viewport.width,
 height:viewport.height
 });
 
-log(
-hindiStream,
-`Synchronizing Hindi Layout Page ${pageNum}`,
-'green'
-);
+const textContent=await page.getTextContent();
 
-let y=viewport.height-60;
+const items=textContent.items;
+
+totalChunks+=items.length;
+
+chunkCount.innerText=totalChunks;
 
 for(const item of items){
 
-const x=item.transform[4];
-
-const itemY=viewport.height-item.transform[5];
+try{
 
 const original=item.str;
 
 if(!original.trim()) continue;
 
-let translatedText=
-translateScientific(original);
+totalTokens+=original.length;
 
-translatedText=
-translatedText.replace(/[�-]/g,'');
+tokenCount.innerText=totalTokens;
 
-const width=item.width+8;
+log(
+englishStream,
+original
+);
 
-const height=14;
+let translated=translate(original);
+
+translated=translated
+.replace(/[\u0000-\u001F]/g,'');
+
+const x=item.transform[4];
+
+const y=viewport.height-item.transform[5];
+
+const fontSize=Math.max(
+8,
+Math.min(
+18,
+item.height || 10
+)
+);
+
+const width=Math.max(
+item.width+10,
+translated.length*fontSize*0.45
+);
 
 pdfPage.drawRectangle({
 x:x-1,
-y:itemY-2,
+y:y-2,
 width:width,
-height:height,
+height:fontSize+6,
 color:rgb(1,1,1),
 opacity:1
 });
 
 pdfPage.drawText(
-translatedText,
+translated,
 {
 x:x,
-y:itemY,
-size:10,
-font:hindiFont,
+y:y,
+size:fontSize,
+font:unicodeFont,
 color:rgb(0,0,0),
-maxWidth:width+100
+maxWidth:width+200,
+lineHeight:fontSize+2
 }
+);
+
+log(
+hindiStream,
+translated,
+'green'
+);
+
+}catch(innerError){
+
+console.error(innerError);
+
+log(
+hindiStream,
+`Skipped unsupported node safely`,
+'orange'
 );
 
 }
 
+}
+
 const progress=Math.floor(
-(pageNum/pdf.numPages)*100
+(p/pdf.numPages)*100
 );
 
 updateProgress(progress);
 
 }
 
-const finalBytes=await newPdf.save();
+const finalBytes=await outputPdf.save({
+useObjectStreams:false
+});
 
 finalBlob=new Blob(
 [finalBytes],
@@ -688,19 +672,19 @@ hindiStream,
 'green'
 );
 
-}catch(err){
+}catch(error){
 
-console.error(err);
+console.error(error);
 
 statusText.innerText='Error';
 
 log(
 hindiStream,
-err.message,
+error.message,
 'red'
 );
 
-alert(err.message);
+alert(error.message);
 
 }finally{
 
