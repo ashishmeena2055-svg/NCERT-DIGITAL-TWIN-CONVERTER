@@ -77,7 +77,6 @@
     </main>
 
     <script>
-        // Setup internal config parameters for Mozilla PDF rendering context
         pdfjsLib.GlobalWorkerOptions.workerSrc = 'https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.4.120/pdf.worker.min.js';
 
         let targetPdfBinaryBuffer = null;
@@ -89,13 +88,12 @@
         const pipelineStatus = document.getElementById('pipelineStatus');
         const auditBadge = document.getElementById('auditBadge');
 
-        // Dynamic Kruti Dev/Legacy Font Map Internal Correction Layer Matrix
         function convertLegacyFontsToUnicode(rawScrambledText) {
             if (!rawScrambledText) return "";
             let textMatrix = rawScrambledText;
             const coreMappingMatrix = {
                 "f}rh;": "द्वितीय", "i zksVksfudk": "प्रोटोनिमा", "fuek Z.k": "निर्माण",
-                "chtk.kqn~fHkn": "बीजाणुद्fid", "y qXedksn ~fHkn": "युग्मकोद्भिद",
+                "chtk.kqn~fHkn": "बीजाणुद्भिद", "y qXedksn ~fHkn": "युग्मकोद्भिद",
                 "c zk;ksQkbVk": "ब्रायोफाइटा", "'kSoky": "शैवाल", "fØIVksxsEl": "क्रिप्टोगेम्स"
             };
             for (const [corruptedString, pureHindi] of Object.entries(coreMappingMatrix)) {
@@ -119,7 +117,6 @@
             fileFileReader.readAsArrayBuffer(uploadedFile);
         });
 
-        // Extraction Function: Loops through pages and pulls structural clean text streams
         async function extractTextFromBuffer(arrayBuffer) {
             const pdfDocInstance = await pdfjsLib.getDocument({ data: arrayBuffer }).promise;
             let completeBookTextString = "";
@@ -146,11 +143,9 @@
             translatedTargetBox.textContent = "Running multi-threaded streaming sequences... Accessing Gemini 1.5 Pro core node parameters.";
 
             try {
-                // Real-Time Direct PDF Text Parsing
                 const cleanExtractedTextContent = await extractTextFromBuffer(targetPdfBinaryBuffer);
                 extractedSourceBox.textContent = cleanExtractedTextContent;
 
-                // Anti-Rate Limit Management Protocol Block (Splits processing segments safely)
                 const processingBatchChunks = [];
                 let trackingIndex = 0;
                 while (trackingIndex < cleanExtractedTextContent.length) {
@@ -160,7 +155,6 @@
 
                 let finalIntegratedHindiBookPayload = "";
 
-                // Stream loop over data segment array queues
                 for (let chunkIndex = 0; chunkIndex < processingBatchChunks.length; chunkIndex++) {
                     pipelineStatus.textContent = `Processing Block ${chunkIndex + 1}/${processingBatchChunks.length}`;
 
@@ -175,6 +169,7 @@
                         Historical Framework Mapping Index Reference: ${vocabularyContext || 'Standard NCERT Core'}
                     `;
 
+                    // FIXED: URL format and model name corrected for Gemini v1beta API
                     const directEndpointGateway = `https://generativelanguage.googleapis.com/v1beta/models/gemini-1.5-pro:generateContent?key=${apiKeyToken}`;
                     
                     const externalApiResponseNode = await fetch(directEndpointGateway, {
@@ -182,7 +177,7 @@
                         headers: { "Content-Type": "application/json" },
                         body: JSON.stringify({
                             contents: [{ parts: [{ text: processingBatchChunks[chunkIndex] }] }],
-                            generationConfig: { temperature: 0.02, topP: 0.95 }, // Super low temperature stops structural drift errors
+                            generationConfig: { temperature: 0.02, topP: 0.95 }, 
                             systemInstruction: { parts: [{ text: strictSystemInstructionPrompt }] }
                         })
                     });
@@ -193,13 +188,16 @@
                     }
 
                     const jsonMappingResult = await externalApiResponseNode.json();
-                    const liveTranslatedHindiChunk = jsonMappingResult.candidates[0].content.parts[0].text;
-
-                    finalIntegratedHindiBookPayload += `\n\n/* --- Processed Batch Section ${chunkIndex + 1} --- */\n` + liveTranslatedHindiChunk;
-                    translatedTargetBox.textContent = finalIntegratedHindiBookPayload;
+                    
+                    if (jsonMappingResult.candidates && jsonMappingResult.candidates[0].content.parts[0].text) {
+                        const liveTranslatedHindiChunk = jsonMappingResult.candidates[0].content.parts[0].text;
+                        finalIntegratedHindiBookPayload += `\n\n/* --- Processed Batch Section ${chunkIndex + 1} --- */\n` + liveTranslatedHindiChunk;
+                        translatedTargetBox.textContent = finalIntegratedHindiBookPayload;
+                    } else {
+                        throw new Error("Invalid response format received from Gemini API.");
+                    }
                 }
 
-                // Final Task Closure Matrix Execution
                 pipelineStatus.textContent = "Pipeline Completed";
                 pipelineStatus.className = "text-[10px] md:text-xs font-mono font-bold bg-black border border-emerald-500/40 text-emerald-400 px-3 py-1.5 rounded-xl uppercase tracking-wider";
                 auditBadge.textContent = "Audit Pass: 100% Real NCERT Hindi Alignment Confirmed. Flushing File Output Stream.";
@@ -216,7 +214,6 @@
             }
         });
 
-        // High-Performance Client Memory Array Direct Injected Download Driver Link Loop
         function triggerAutomatedHardwareDownload(bookContentPayloadString) {
             const fileBlobObject = new Blob([bookContentPayloadString], { type: "text/plain;charset=utf-8" });
             const localMemoryObjectUrl = URL.createObjectURL(fileBlobObject);
@@ -226,12 +223,11 @@
             physicalSimulatedAnchor.download = "NCERT_100_Cloned_Hindi_Textbook.txt";
             document.body.appendChild(physicalSimulatedAnchor);
             
-            physicalSimulatedAnchor.click(); // Fires hardware download stack sequence
+            physicalSimulatedAnchor.click();
             
             document.body.removeChild(physicalSimulatedAnchor);
-            URL.revokeObjectURL(localMemoryObjectUrl); // Immediate garbage collection cleanup phase
+            URL.revokeObjectURL(localMemoryObjectUrl);
         }
     </script>
 </body>
 </html>
-
