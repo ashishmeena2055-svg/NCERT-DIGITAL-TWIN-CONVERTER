@@ -1,27 +1,3 @@
-<!-- 
-IMPORTANT:
-
-1. Download this font:
-https://github.com/google/fonts/raw/main/ofl/mukta/Mukta-Regular.ttf
-
-2. Rename to:
-Mukta-Regular.ttf
-
-3. Put font in SAME folder as index.html
-
-4. This version:
-✅ FIXES WinAnsi error permanently
-✅ Uses embedded Unicode Hindi font
-✅ Better English→Hindi overlay fitting
-✅ NCERT / ALLEN style layout
-✅ Dynamic font scaling
-✅ Center fitting
-✅ Hindi rendering stable
-✅ No Helvetica fallback
-✅ No StandardFonts
-✅ No WinAnsi crash
--->
-
 <!DOCTYPE html>
 <html lang="en">
 <head>
@@ -33,7 +9,7 @@ Mukta-Regular.ttf
 
 <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap" rel="stylesheet">
 
-<script type="module" src="https://cdnjs.cloudflare.com/ajax/libs/pdf.js/4.4.168/pdf.min.mjs"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/pdf.js/4.4.168/pdf.min.js"></script>
 
 <script src="https://cdnjs.cloudflare.com/ajax/libs/pdf-lib/1.17.1/pdf-lib.min.js"></script>
 
@@ -255,8 +231,17 @@ margin-top:8px;
 
 <input type="file" id="pdfInput" accept=".pdf">
 
+</div>
+
+<div class="section">
+
+<h3>Upload Hindi Unicode Font</h3>
+
+<input type="file" id="fontInput" accept=".ttf,.otf">
+
 <div class="small">
-Supports NCERT / ALLEN / NEET PDFs
+Recommended:
+Mukta-Regular.ttf
 </div>
 
 </div>
@@ -353,31 +338,34 @@ Hindi Synchronization
 
 </div>
 
-<script type="module">
-
-import * as pdfjsLib from 'https://cdnjs.cloudflare.com/ajax/libs/pdf.js/4.4.168/pdf.min.mjs';
+<script>
 
 pdfjsLib.GlobalWorkerOptions.workerSrc =
-'https://cdnjs.cloudflare.com/ajax/libs/pdf.js/4.4.168/pdf.worker.min.mjs';
+'https://cdnjs.cloudflare.com/ajax/libs/pdf.js/4.4.168/pdf.worker.min.js';
 
 const {
 PDFDocument,
 rgb
 }=PDFLib;
 
-PDFLib.Config.defaultWordBreaks=[' '];
-
 const pdfInput=document.getElementById('pdfInput');
 
+const fontInput=document.getElementById('fontInput');
+
 const startBtn=document.getElementById('startBtn');
+
 const downloadBtn=document.getElementById('downloadBtn');
 
 const englishStream=document.getElementById('englishStream');
+
 const hindiStream=document.getElementById('hindiStream');
 
 const pageCount=document.getElementById('pageCount');
+
 const statusText=document.getElementById('statusText');
+
 const tokenCount=document.getElementById('tokenCount');
+
 const chunkCount=document.getElementById('chunkCount');
 
 const progressBar=document.getElementById('progressBar');
@@ -388,23 +376,16 @@ let finalBlob=null;
 
 const dictionary={
 
-"Alcohol":"अल्कोहल",
-"Phenol":"फिनॉल",
-"Ether":"ईथर",
 "Reaction":"अभिक्रिया",
 "Oxidation":"ऑक्सीकरण",
 "Reduction":"अपचयन",
 "Hydrogen":"हाइड्रोजन",
+"Alcohol":"अल्कोहल",
 "Metabolism":"चयापचय",
 "Fermentation":"किण्वन",
-"Xylem":"जाइलम",
-"Phloem":"फ्लोएम",
-"Bryophytes":"ब्रायोफाइट्स",
-"Protonema":"प्रोटोनिमा",
 "Question":"प्रश्न",
-"Solution":"समाधान",
-"Formula":"सूत्र",
-"Chapter":"अध्याय"
+"Chapter":"अध्याय",
+"Solution":"समाधान"
 
 };
 
@@ -426,6 +407,15 @@ progressBar.style.width=v+'%';
 
 }
 
+function sanitize(text){
+
+return String(text)
+.replace(/[\u0000-\u001F]/g,' ')
+.replace(/\s+/g,' ')
+.trim();
+
+}
+
 function translate(text){
 
 let out=text;
@@ -444,37 +434,25 @@ return out;
 
 }
 
-function sanitizeUnicode(text){
-
-if(!text) return '';
-
-return String(text)
-.replace(/[\u0000-\u001F]/g,' ')
-.replace(/\s+/g,' ')
-.trim();
-
-}
-
-function safeDrawText({
+function safeDraw({
 page,
 text,
 x,
 y,
-size,
 font,
+size,
 maskWidth
 }){
 
 try{
 
-text=sanitizeUnicode(text);
+text=sanitize(text);
 
 if(!text.length) return;
 
-const fittedSize=
-Math.min(
+const fittedSize=Math.min(
 size,
-(maskWidth / Math.max(text.length,1))*1.8
+(maskWidth/Math.max(text.length,1))*1.8
 );
 
 const textWidth=
@@ -493,17 +471,13 @@ x:adjustedX,
 y:y,
 size:fittedSize*0.82,
 font:font,
-color:rgb(0,0,0),
-lineHeight:fittedSize+2
+color:rgb(0,0,0)
 }
 );
 
 }catch(err){
 
-console.log(
-'Safe Skip:',
-err.message
-);
+console.log(err);
 
 }
 
@@ -513,13 +487,17 @@ async function renderPreview(page){
 
 previewWrap.innerHTML='';
 
-const viewport=page.getViewport({scale:1.3});
+const viewport=
+page.getViewport({scale:1.2});
 
-const canvas=document.createElement('canvas');
+const canvas=
+document.createElement('canvas');
 
-const ctx=canvas.getContext('2d');
+const ctx=
+canvas.getContext('2d');
 
 canvas.width=viewport.width;
+
 canvas.height=viewport.height;
 
 previewWrap.appendChild(canvas);
@@ -535,7 +513,11 @@ async function processPDF(){
 
 try{
 
-const pdfFile=pdfInput.files[0];
+const pdfFile=
+pdfInput.files[0];
+
+const fontFile=
+fontInput.files[0];
 
 if(!pdfFile){
 
@@ -545,46 +527,60 @@ return;
 
 }
 
-startBtn.disabled=true;
+if(!fontFile){
 
-englishStream.innerHTML='';
-hindiStream.innerHTML='';
+alert('Upload Font');
+
+return;
+
+}
+
+startBtn.disabled=true;
 
 statusText.innerText='Loading';
 
-const pdfBytes=await pdfFile.arrayBuffer();
+englishStream.innerHTML='';
 
-const pdf=await pdfjsLib.getDocument({
+hindiStream.innerHTML='';
+
+const pdfBytes=
+await pdfFile.arrayBuffer();
+
+const pdf=
+await pdfjsLib.getDocument({
 data:pdfBytes
 }).promise;
 
-pageCount.innerText=pdf.numPages;
+pageCount.innerText=
+pdf.numPages;
 
-const outputPdf=await PDFDocument.create();
+const outputPdf=
+await PDFDocument.create();
 
 outputPdf.registerFontkit(fontkit);
 
 const fontBytes=
-await fetch('./Mukta-Regular.ttf')
-.then(r=>r.arrayBuffer());
+await fontFile.arrayBuffer();
 
 const unicodeFont=
 await outputPdf.embedFont(
 fontBytes,
 {
-subset:false,
-customName:'MuktaUnicode'
+subset:false
 }
 );
 
 let totalTokens=0;
+
 let totalNodes=0;
 
 for(let p=1;p<=pdf.numPages;p++){
 
-statusText.innerText=`Page ${p}`;
+statusText.innerText=
+`Page ${p}`;
 
-const page=await pdf.getPage(p);
+const page=
+await pdf.getPage(p);
 
 if(p===1){
 
@@ -592,13 +588,17 @@ await renderPreview(page);
 
 }
 
-const viewport=page.getViewport({scale:2});
+const viewport=
+page.getViewport({scale:2});
 
-const canvas=document.createElement('canvas');
+const canvas=
+document.createElement('canvas');
 
-const ctx=canvas.getContext('2d');
+const ctx=
+canvas.getContext('2d');
 
 canvas.width=viewport.width;
+
 canvas.height=viewport.height;
 
 await page.render({
@@ -606,7 +606,8 @@ canvasContext:ctx,
 viewport
 }).promise;
 
-const imgData=canvas.toDataURL('image/jpeg',1);
+const imgData=
+canvas.toDataURL('image/jpeg',1);
 
 const jpg=
 await outputPdf.embedJpg(imgData);
@@ -627,23 +628,28 @@ height:viewport.height
 const textContent=
 await page.getTextContent();
 
-const items=textContent.items;
+const items=
+textContent.items;
 
 for(const item of items){
 
 try{
 
-const original=item.str;
+const original=
+item.str;
 
 if(!original.trim()) continue;
 
 totalNodes++;
 
-chunkCount.innerText=totalNodes;
+chunkCount.innerText=
+totalNodes;
 
-totalTokens+=original.length;
+totalTokens+=
+original.length;
 
-tokenCount.innerText=totalTokens;
+tokenCount.innerText=
+totalTokens;
 
 log(
 englishStream,
@@ -654,12 +660,14 @@ let translated=
 translate(original);
 
 translated=
-sanitizeUnicode(translated);
+sanitize(translated);
 
-const x=item.transform[4];
+const x=
+item.transform[4];
 
 const y=
-viewport.height-item.transform[5];
+viewport.height-
+item.transform[5];
 
 const fontSize=
 Math.max(
@@ -675,7 +683,7 @@ Math.max(
 item.width+20,
 translated.length*
 fontSize*
-0.52
+0.5
 );
 
 pdfPage.drawRectangle({
@@ -683,17 +691,16 @@ x:x-2,
 y:y-2,
 width:maskWidth,
 height:fontSize+8,
-color:rgb(1,1,1),
-opacity:1
+color:rgb(1,1,1)
 });
 
-safeDrawText({
+safeDraw({
 page:pdfPage,
 text:translated,
 x:x,
 y:y,
-size:fontSize,
 font:unicodeFont,
+size:fontSize,
 maskWidth:maskWidth
 });
 
@@ -737,10 +744,8 @@ downloadBtn.disabled=false;
 
 statusText.innerText='Completed';
 
-log(
-hindiStream,
-'PDF Conversion Completed',
-'green'
+alert(
+'PDF Conversion Completed'
 );
 
 }catch(error){
@@ -748,12 +753,6 @@ hindiStream,
 console.error(error);
 
 statusText.innerText='Error';
-
-log(
-hindiStream,
-error.message,
-'red'
-);
 
 alert(error.message);
 
