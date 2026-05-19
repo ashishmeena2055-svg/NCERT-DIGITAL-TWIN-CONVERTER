@@ -1,221 +1,875 @@
 <!DOCTYPE html>
-<html lang="hi">
+<html lang="en">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>NCERT Pure Client-Side Twin Engine (No-API / No-External-Fetch)</title>
-    <script src="https://cdn.tailwindcss.com"></script>
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.4.120/pdf.min.js"></script>
-    <style>
-        body { background-color: #0a0a0a; color: #ffffff; font-family: system-ui, sans-serif; }
-        ::-webkit-scrollbar { width: 5px; }
-        ::-webkit-scrollbar-track { background: #0f0f0f; }
-        ::-webkit-scrollbar-thumb { background: #ff0050; border-radius: 3px; }
-    </style>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+<title>NCERT Dual-Medium PDF Cloner Engine</title>
+
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&family=Noto+Sans+Devanagari:wght@400;500;600;700&display=swap" rel="stylesheet">
+
+<script src="https://cdnjs.cloudflare.com/ajax/libs/pdf.js/4.4.168/pdf.min.mjs" type="module"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/pdf-lib/1.17.1/pdf-lib.min.js"></script>
+
+<style>
+*{
+    margin:0;
+    padding:0;
+    box-sizing:border-box;
+}
+
+body{
+    background:#0a0a0a;
+    color:white;
+    font-family:'Poppins',sans-serif;
+    overflow:hidden;
+}
+
+.app{
+    display:flex;
+    height:100vh;
+    width:100%;
+}
+
+.sidebar{
+    width:340px;
+    background:rgba(255,255,255,0.04);
+    border-right:1px solid rgba(255,255,255,0.08);
+    backdrop-filter:blur(18px);
+    padding:22px;
+    overflow:auto;
+}
+
+.main{
+    flex:1;
+    display:flex;
+    flex-direction:column;
+    overflow:hidden;
+}
+
+.header{
+    height:80px;
+    border-bottom:1px solid rgba(255,255,255,0.08);
+    display:flex;
+    align-items:center;
+    justify-content:space-between;
+    padding:0 25px;
+    background:rgba(255,255,255,0.03);
+    backdrop-filter:blur(14px);
+}
+
+.brand{
+    font-size:22px;
+    font-weight:700;
+    background:linear-gradient(90deg,#ff0050,#10b981);
+    -webkit-background-clip:text;
+    -webkit-text-fill-color:transparent;
+}
+
+.grid{
+    flex:1;
+    display:grid;
+    grid-template-columns:1fr 1fr;
+    gap:18px;
+    padding:18px;
+    overflow:hidden;
+}
+
+.panel{
+    background:rgba(255,255,255,0.04);
+    border:1px solid rgba(255,255,255,0.08);
+    border-radius:24px;
+    overflow:hidden;
+    display:flex;
+    flex-direction:column;
+    backdrop-filter:blur(16px);
+    box-shadow:0 0 30px rgba(255,0,80,0.15);
+}
+
+.panel-header{
+    padding:16px 20px;
+    border-bottom:1px solid rgba(255,255,255,0.08);
+    display:flex;
+    justify-content:space-between;
+    align-items:center;
+}
+
+.panel-title{
+    font-size:15px;
+    font-weight:600;
+}
+
+.status{
+    display:flex;
+    align-items:center;
+    gap:8px;
+    font-size:12px;
+    color:#bdbdbd;
+}
+
+.dot{
+    width:10px;
+    height:10px;
+    border-radius:50%;
+    background:#10b981;
+    box-shadow:0 0 12px #10b981;
+}
+
+.stream{
+    flex:1;
+    overflow:auto;
+    padding:18px;
+    font-size:14px;
+    line-height:1.7;
+}
+
+.log{
+    padding:10px 14px;
+    border-radius:14px;
+    margin-bottom:12px;
+    background:rgba(255,255,255,0.04);
+    border:1px solid rgba(255,255,255,0.05);
+}
+
+.log.red{
+    border-color:#ff0050;
+    background:rgba(255,0,80,0.08);
+}
+
+.log.green{
+    border-color:#10b981;
+    background:rgba(16,185,129,0.08);
+}
+
+.log.orange{
+    border-color:#ff9800;
+    background:rgba(255,152,0,0.08);
+}
+
+.section{
+    margin-bottom:24px;
+}
+
+.section h3{
+    margin-bottom:12px;
+    font-size:14px;
+    color:#ff0050;
+    font-weight:600;
+}
+
+input,
+textarea{
+    width:100%;
+    background:rgba(255,255,255,0.05);
+    border:1px solid rgba(255,255,255,0.08);
+    color:white;
+    border-radius:14px;
+    padding:14px;
+    outline:none;
+    font-family:inherit;
+}
+
+input:focus,
+textarea:focus{
+    border-color:#ff0050;
+    box-shadow:0 0 15px rgba(255,0,80,0.25);
+}
+
+button{
+    width:100%;
+    border:none;
+    border-radius:16px;
+    padding:15px;
+    font-weight:700;
+    cursor:pointer;
+    margin-top:14px;
+    color:white;
+    background:linear-gradient(90deg,#ff0050,#ff3366);
+    transition:0.3s;
+}
+
+button:hover{
+    transform:translateY(-2px);
+    box-shadow:0 10px 30px rgba(255,0,80,0.3);
+}
+
+.secondary{
+    background:linear-gradient(90deg,#10b981,#00c98b);
+}
+
+.telemetry{
+    display:grid;
+    grid-template-columns:1fr 1fr;
+    gap:12px;
+}
+
+.metric{
+    background:rgba(255,255,255,0.04);
+    padding:16px;
+    border-radius:18px;
+    border:1px solid rgba(255,255,255,0.05);
+}
+
+.metric h2{
+    font-size:22px;
+    margin-top:8px;
+}
+
+canvas{
+    max-width:100%;
+    border-radius:14px;
+}
+
+.preview-wrap{
+    padding:20px;
+    overflow:auto;
+    flex:1;
+}
+
+.progress{
+    width:100%;
+    height:10px;
+    border-radius:100px;
+    background:rgba(255,255,255,0.06);
+    overflow:hidden;
+    margin-top:10px;
+}
+
+.progress-inner{
+    height:100%;
+    width:0%;
+    background:linear-gradient(90deg,#ff0050,#10b981);
+    transition:0.4s;
+}
+
+.small{
+    font-size:12px;
+    color:#9e9e9e;
+    margin-top:8px;
+}
+
+.filebox{
+    border:2px dashed rgba(255,255,255,0.1);
+    padding:18px;
+    border-radius:18px;
+}
+
+.tag{
+    display:inline-flex;
+    align-items:center;
+    gap:6px;
+    padding:8px 12px;
+    border-radius:999px;
+    background:rgba(255,255,255,0.05);
+    font-size:12px;
+    margin-right:8px;
+    margin-bottom:8px;
+}
+
+.footer{
+    padding:14px;
+    border-top:1px solid rgba(255,255,255,0.08);
+    font-size:12px;
+    color:#9e9e9e;
+    text-align:center;
+}
+</style>
 </head>
-<body class="p-3 md:p-6 min-h-screen flex flex-col">
 
-    <header class="w-full max-w-7xl mx-auto mb-6 pb-4 border-b border-[#ff0050]/20 flex justify-between items-center">
-        <div>
-            <h1 class="text-xl md:text-3xl font-black tracking-wider text-transparent bg-clip-text bg-gradient-to-r from-white via-gray-200 to-[#ff0050]">
-                NCERT SOLID ENGINE
-            </h1>
-            <p class="text-[10px] md:text-xs tracking-widest text-gray-500 uppercase font-mono mt-1">100% Offline Embedded Core / Zero API Network Dependencies</p>
-        </div>
-        <div id="engineStatus" class="text-[10px] md:text-xs font-mono font-bold bg-black border border-emerald-500/30 text-emerald-400 px-3 py-1.5 rounded-xl uppercase tracking-wider">
-            NATIVE DESKTOP MODE
-        </div>
-    </header>
+<body>
 
-    <main class="w-full max-w-7xl mx-auto grid grid-cols-1 lg:grid-cols-12 gap-5 flex-1 items-stretch">
-        
-        <section class="lg:col-span-4 bg-[#111111] border border-gray-950 rounded-2xl p-5 flex flex-col gap-5">
-            <div class="bg-emerald-950/20 border border-emerald-500/30 p-3 rounded-xl text-center">
-                <span class="text-[10px] font-mono text-emerald-400 font-bold uppercase tracking-widest block mb-0.5">🛡️ Isolated Sandbox Active</span>
-                <p class="text-[9px] text-gray-500">External HTTP network fetches eliminated. System will never report 404 or Fetch Error.</p>
-            </div>
+<div class="app">
 
-            <div>
-                <label class="block text-[10px] font-black uppercase tracking-widest text-gray-400 mb-2">1. Select Target English Textbook PDF</label>
-                <div class="border-2 border-dashed border-gray-800 hover:border-[#ff0050]/40 bg-black/40 rounded-xl p-6 text-center relative transition-all cursor-pointer group">
-                    <input type="file" id="sourcePdfFile" accept=".pdf" class="absolute inset-0 opacity-0 cursor-pointer z-10" />
-                    <p id="uploadPrompt" class="text-xs font-bold text-gray-300 group-hover:text-[#ff0050] transition-colors">Select English PDF Module</p>
-                    <p class="text-[9px] text-gray-600 mt-0.5">Reads structure streams straight into offline volatile ram matrix</p>
-                </div>
-            </div>
+<div class="sidebar">
 
-            <div>
-                <label class="block text-[10px] font-black uppercase tracking-widest text-gray-400 mb-2">2. Alignment Parameter Target</label>
-                <input type="text" id="subjectContext" placeholder="Biology Class 11 Diversity Chapter NCERT Standard" class="w-full bg-black border border-gray-800 focus:border-[#ff0050] rounded-xl p-3 text-xs text-white outline-none transition-all font-mono" />
-            </div>
+<div class="section">
+<h3>Gemini API Configuration</h3>
 
-            <button id="executeProcessingBtn" class="w-full mt-auto bg-gradient-to-r from-[#ff0050] to-[#b3003b] hover:opacity-95 font-black py-4 rounded-xl text-xs uppercase tracking-widest transition-all shadow-lg shadow-[#ff0050]/10">
-                Execute Local Core Processing
-            </button>
-        </section>
+<input type="password" id="apiKey" placeholder="Enter Gemini API Key">
 
-        <section class="lg:col-span-8 bg-[#111111] border border-gray-950 rounded-2xl p-4 flex flex-col h-[580px]">
-            <div class="flex justify-between items-center border-b border-gray-900 pb-2 mb-3">
-                <span class="text-[10px] font-black uppercase tracking-widest text-gray-500">Live Dual-Canvas Verification System</span>
-                <span id="auditBadge" class="text-[10px] font-mono text-emerald-500 uppercase tracking-widest font-bold">Offline Analytics Monitoring Enabled</span>
-            </div>
+<div class="small">
+Recommended Model: Gemini 1.5 Flash Production Endpoint
+</div>
+</div>
 
-            <div class="grid grid-cols-1 md:grid-cols-2 gap-4 flex-1 overflow-hidden h-full">
-                <div class="bg-black/50 border border-gray-900 rounded-xl p-3 overflow-y-auto flex flex-col">
-                    <div class="text-[9px] font-mono uppercase font-bold text-gray-600 tracking-wider mb-2 border-b border-gray-950 pb-1">Extracted English PDF Stream</div>
-                    <pre id="extractedSourceBox" class="text-[11px] font-mono text-gray-400 whitespace-pre-wrap leading-relaxed flex-1">Awaiting textbook data arrays mapping configurations...</pre>
-                </div>
+<div class="section">
+<h3>Upload NCERT / NEET English PDF</h3>
 
-                <div class="bg-black/50 border border-gray-900 rounded-xl p-3 overflow-y-auto flex flex-col">
-                    <div class="text-[9px] font-mono uppercase font-bold text-[#ff0050]/70 tracking-wider mb-2 border-b border-gray-950 pb-1">Real-Time Translated Hindi Textbook</div>
-                    <pre id="translatedTargetBox" class="text-[11px] font-mono text-white whitespace-pre-wrap leading-relaxed flex-1">Processed live Hindi data canvas nodes stream here...</pre>
-                </div>
-            </div>
-        </section>
-    </main>
+<div class="filebox">
+<input type="file" id="pdfInput" accept=".pdf">
+</div>
 
-    <script>
-        pdfjsLib.GlobalWorkerOptions.workerSrc = 'https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.4.120/pdf.worker.min.js';
+<div class="small">
+Large textbooks supported with intelligent chunk streaming.
+</div>
+</div>
 
-        let targetPdfBinaryBuffer = null;
-        const sourcePdfFile = document.getElementById('sourcePdfFile');
-        const uploadPrompt = document.getElementById('uploadPrompt');
-        const extractedSourceBox = document.getElementById('extractedSourceBox');
-        const translatedTargetBox = document.getElementById('translatedTargetBox');
-        const executeProcessingBtn = document.getElementById('executeProcessingBtn');
-        const engineStatus = document.getElementById('engineStatus');
-        const auditBadge = document.getElementById('auditBadge');
+<div class="section">
+<h3>Processing Controls</h3>
 
-        // Dynamic High-Fidelity Local Linguistic Alignment Processing Matrix
-        const clientSideTranslationDictionary = {
-            "diversity": "विविधता [Diversity]", "living": "सजीव [Living]", "world": "जगत [World]",
-            "classification": "वर्गीकरण [Classification]", "plant": "पादप [Plant]", "kingdom": "जगत [Kingdom]",
-            "metabolism": "चयापचय [Metabolism]", "anabolism": "उपचय [Anabolism]", "catabolism": "अपचय [Catabolism]",
-            "protonema": "प्रोटोनिमा [Protonema]", "prothallus": "प्रोथैलस [Prothallus]", "bryophytes": "ब्रायोफाइट्स [Bryophytes]",
-            "pteridophytes": "टेरिडोफाइट्स [Pteridophytes]", "gymnosperms": "जिम्नोस्पर्म [Gymnosperms]", "angiosperms": "एंजियोस्पर्म [Angiosperms]",
-            "eucalyptus": "यूकेलिप्टस [Eucalyptus]", "wolfia": "वोल्फिया [Wolfia]", "sequoia": "सिकोइया [Sequoia]",
-            "banyan": "बरगद [Banyan]", "xylem": "जाइलम [Xylem]", "vessels": "वाहिकाएं [Vessels]",
-            "rhizoids": "मूलाभास [Rhizoids]", "thallus": "थैलस [Thallus]", "haploid": "अगुणित [Haploid]",
-            "diploid": "द्विगुणित [Diploid]", "gametophytes": "युग्मकोद्भिद [Gametophytes]", "sporophytes": "बीजाणुद्भिद [Sporophytes]",
-            "monoecious": "उभयलिंगाश्रयी [Monoecious]", "dioecious": "एकलिंगाश्रयी [Dioecious]", "heterosporous": "विषमबीजाणुक [Heterosporous]",
-            "homosporous": "समबीजाणुक [Homosporous]", "roots": "मूल [Roots]", "stem": "तनाव [Stem]", "leaves": "पत्तियां [Leaves]",
-            "botany": "वनस्पति विज्ञान [Botany]", "pre-medical": "प्री-मेडिकल [Pre-Medical]", "study": "अध्ययन [Study]", "material": "सामग्री [Material]"
-        };
+<button id="startBtn">
+Start Hindi PDF Cloning
+</button>
 
-        // Advanced Legacy Kruti Dev / Allen Glitched Font Core Parser Matrix Module
-        function parseGlitchFontsNatively(rawSourceText) {
-            if (!rawSourceText) return "";
-            let dataStream = rawSourceText;
-            const structuralFontMap = {
-                "f}rh;": "द्वितीय [Secondary]", "i zksVksfudk": "प्रोटोनिमा [Protonema]", "fuek Z.k": "निर्माण [Formation]",
-                "chtk.kqn~fHkn": "बीजाणुद्भिद [Sporophyte]", "y qXedksn ~fHkn": "युग्मकोद्भिद [Gametophyte]",
-                "c zk;ksQkbVk": "ब्रायोफाइटा [Bryophyta]", "'kSoky": "शैवाल [Algae]", "fØIVksxsEl": "क्रिप्टोगेम्स [Cryptogams]",
-                "e sa": "में", "[k.Mu]": "खंडन", "dfydh;": "कलिका", "ij": "पर", "fuHkZj": "निर्भर",
-                "vkaf'kd": "आंशिक", "lcls": "सबसे", "fodflr": "विकसित", "ih< +h": "पीढ़ी", "g zkflr": "ह्रासित",
-                "ftEuksLieZ": "जिम्नोस्पर्म", "V sfjMksQkbV~l": "टेरिडोफाइट्स", "ftEuksLie ~fHkn": "जिम्नोस्पर्म पीढ़ी"
-            };
-            for (const [corruptedChunk, pureUnicode] of Object.entries(structuralFontMap)) {
-                dataStream = dataStream.replaceAll(corruptedChunk, pureUnicode);
-            }
-            return dataStream;
+<button class="secondary" id="downloadBtn" disabled>
+Download Hindi Edition PDF
+</button>
+</div>
+
+<div class="section">
+<h3>Real-Time Telemetry</h3>
+
+<div class="telemetry">
+
+<div class="metric">
+<div>Pages</div>
+<h2 id="pageCount">0</h2>
+</div>
+
+<div class="metric">
+<div>Tokens</div>
+<h2 id="tokenCount">0</h2>
+</div>
+
+<div class="metric">
+<div>Chunks</div>
+<h2 id="chunkCount">0</h2>
+</div>
+
+<div class="metric">
+<div>Status</div>
+<h2 id="statusText">Idle</h2>
+</div>
+
+</div>
+
+<div class="progress">
+<div class="progress-inner" id="progressBar"></div>
+</div>
+
+</div>
+
+<div class="section">
+<h3>Scientific Hybrid Dictionary</h3>
+
+<div class="tag">चयापचय [Metabolism]</div>
+<div class="tag">किण्वन [Fermentation]</div>
+<div class="tag">प्रोटोनिमा [Protonema]</div>
+<div class="tag">जाइलम वाहिकाएँ [Xylem Vessels]</div>
+<div class="tag">काइरल केंद्र [Chiral Center]</div>
+</div>
+
+</div>
+
+<div class="main">
+
+<div class="header">
+<div class="brand">
+NCERT Dual-Medium PDF Cloner Engine
+</div>
+
+<div class="status">
+<div class="dot"></div>
+Live Layout Synchronization
+</div>
+</div>
+
+<div class="grid">
+
+<div class="panel">
+
+<div class="panel-header">
+<div class="panel-title">
+Extracted English Token Stream
+</div>
+</div>
+
+<div class="stream" id="englishStream"></div>
+
+</div>
+
+<div class="panel">
+
+<div class="panel-header">
+<div class="panel-title">
+Live Hindi PDF Layout Generation
+</div>
+</div>
+
+<div class="stream" id="hindiStream"></div>
+
+</div>
+
+</div>
+
+<div class="panel" style="margin:0 18px 18px 18px;height:340px;">
+<div class="panel-header">
+<div class="panel-title">
+PDF Page Preview Canvas
+</div>
+</div>
+
+<div class="preview-wrap" id="previewWrap"></div>
+
+<div class="footer">
+Advanced Coordinate Geometry Reconstruction • pdf.js + pdf-lib Hybrid Engine
+</div>
+</div>
+
+</div>
+
+</div>
+
+<script type="module">
+
+import * as pdfjsLib from 'https://cdnjs.cloudflare.com/ajax/libs/pdf.js/4.4.168/pdf.min.mjs';
+
+pdfjsLib.GlobalWorkerOptions.workerSrc =
+'https://cdnjs.cloudflare.com/ajax/libs/pdf.js/4.4.168/pdf.worker.min.mjs';
+
+const {
+    PDFDocument,
+    rgb,
+    StandardFonts
+} = PDFLib;
+
+const apiKeyInput = document.getElementById('apiKey');
+const pdfInput = document.getElementById('pdfInput');
+const startBtn = document.getElementById('startBtn');
+const downloadBtn = document.getElementById('downloadBtn');
+
+const englishStream = document.getElementById('englishStream');
+const hindiStream = document.getElementById('hindiStream');
+const previewWrap = document.getElementById('previewWrap');
+
+const pageCountEl = document.getElementById('pageCount');
+const tokenCountEl = document.getElementById('tokenCount');
+const chunkCountEl = document.getElementById('chunkCount');
+const statusText = document.getElementById('statusText');
+const progressBar = document.getElementById('progressBar');
+
+let generatedPdfBlob = null;
+
+const scientificDictionary = {
+    "Metabolism":"चयापचय [Metabolism]",
+    "Fermentation":"किण्वन [Fermentation]",
+    "Xylem Vessels":"जाइलम वाहिकाएँ [Xylem Vessels]",
+    "Protonema":"प्रोटोनिमा [Protonema]",
+    "Bryophytes":"ब्रायोफाइट्स [Bryophytes]",
+    "Wolfia":"वोल्फिया [Wolfia]",
+    "Zymase":"जाइमेज [Zymase]",
+    "Anaerobic":"अवायवीय [Anaerobic]",
+    "Denaturation":"विकृतीकरण [Denaturation]",
+    "Electrophilic Addition":"इलेक्ट्रोफिलिक योग [Electrophilic Addition]",
+    "Chiral Center":"काइरल केंद्र [Chiral Center]"
+};
+
+function addLog(container,text,type=""){
+    const div=document.createElement('div');
+    div.className=`log ${type}`;
+    div.innerText=text;
+    container.prepend(div);
+}
+
+function setProgress(value){
+    progressBar.style.width=`${value}%`;
+}
+
+function splitIntoChunks(text,max=1500){
+
+    const chunks=[];
+    let current='';
+
+    const words=text.split(' ');
+
+    for(const word of words){
+
+        if((current+word).length>max){
+            chunks.push(current);
+            current=word+' ';
+        }else{
+            current+=word+' ';
         }
+    }
 
-        sourcePdfFile.addEventListener('change', async (e) => {
-            const fileReference = e.target.files[0];
-            if (!fileReference) return;
+    if(current.trim().length>0){
+        chunks.push(current);
+    }
 
-            uploadPrompt.textContent = `✔ Array Bound: ${fileReference.name}`;
-            extractedSourceBox.textContent = "Natively unpacking layout configurations from document binary tables...";
+    return chunks;
+}
 
-            const fileFileReader = new FileReader();
-            fileFileReader.onload = function() {
-                targetPdfBinaryBuffer = this.result;
-                extractedSourceBox.textContent = "PDF Vector array buffered safely inside browser sandbox. No active pipeline leaks.";
-            };
-            fileFileReader.readAsArrayBuffer(fileReference);
-        });
+function applyScientificDictionary(text){
 
-        // 100% Offline Multi-Threaded Native Alignment Engine Module
-        async function processAndCloneTextNatively(arrayBuffer) {
-            const pdfDocInstance = await pdfjsLib.getDocument({ data: arrayBuffer }).promise;
-            let fullTargetClonedString = "";
-            let rawTextBufferView = "";
+    let processed=text;
 
-            for (let i = 1; i <= pdfDocInstance.numPages; i++) {
-                const pageInstance = await pdfDocInstance.getPage(i);
-                const textContentData = await pageInstance.getTextContent();
-                
-                // Maps continuous structural stream loops cleanly
-                const originalPageText = textContentData.items.map(item => item.str).join(" ");
-                rawTextBufferView += `\n/* --- ORIGINAL SHEET PAGE ${i} --- */\n` + originalPageText;
-                
-                // Process the current block row natively word by word without hitting any HTTP networks
-                let workingPageArrayWords = originalPageText.split(/\s+/);
-                let compiledHindiPageString = workingPageArrayWords.map(word => {
-                    let standardNormalizeToken = word.toLowerCase().replace(/[^a-zA-Z]/g, "");
-                    
-                    // Match indexing parameters securely
-                    if(clientSideTranslationDictionary[standardNormalizeToken]) {
-                        return clientSideTranslationDictionary[standardNormalizeToken];
+    Object.keys(scientificDictionary).forEach(key=>{
+
+        const regex=new RegExp(key,'gi');
+
+        processed=processed.replace(regex,scientificDictionary[key]);
+    });
+
+    return processed;
+}
+
+function preserveQuestionFormatting(text){
+
+    text=text.replace(/(\d+)\./g,'$1.');
+    text=text.replace(/\((\d+)\)/g,'($1)');
+    text=text.replace(/Que\.\s*(\d+)/g,'प्रश्न $1');
+
+    return text;
+}
+
+async function translateChunk(chunk,apiKey){
+
+    const endpoint =
+    `https://generativelanguage.googleapis.com/v1/models/gemini-1.5-flash:generateContent?key=${apiKey}`;
+
+    const prompt = `
+Translate the following NEET/NCERT scientific English content into precise Hindi.
+
+STRICT RULES:
+- Preserve equations exactly.
+- Preserve options (1), (2), (3), (4).
+- Preserve mathematical notation.
+- Preserve scientific terminology.
+- Maintain textbook formatting.
+- Never convert English numerals into Hindi numerals.
+- Keep units exactly same.
+- Keep chemical formulas unchanged.
+
+CONTENT:
+${chunk}
+`;
+
+    const body = {
+        contents:[
+            {
+                parts:[
+                    {
+                        text:prompt
                     }
-                    return word; // Keep question integers like Que. 1, Ans., options indices (1),(2) perfectly intact
-                }).join(" ");
-
-                // Pass text layers through the offline legacy font patcher module
-                compiledHindiPageString = parseGlitchFontsNatively(compiledHindiPageString);
-
-                fullTargetClonedString += `\n\n/* --- CLONED NCERT SEC SHEET PAGE ${i} --- */\n` + compiledHindiPageString;
-                
-                // Update interface view monitors concurrently
-                extractedSourceBox.textContent = rawTextBufferView;
-                translatedTargetBox.textContent = fullTargetClonedString;
+                ]
             }
-            return fullTargetClonedString;
+        ],
+        generationConfig:{
+            temperature:0.2,
+            topP:0.8,
+            topK:40,
+            maxOutputTokens:2048
         }
+    };
 
-        executeProcessingBtn.addEventListener('click', async () => {
-            if (!targetPdfBinaryBuffer) return alert("Validation Exception: Buffer configuration mismatch. Please choose an English PDF vector file module.");
+    try{
 
-            executeProcessingBtn.disabled = true;
-            engineStatus.textContent = "COMPUTING MEMORY ROWS...";
-            engineStatus.className = "text-[10px] md:text-xs font-mono font-bold bg-black border border-amber-500/40 text-amber-500 px-3 py-1.5 rounded-xl uppercase tracking-wider animate-pulse";
-            translatedTargetBox.textContent = "Executing localized memory segment transformation... Processing embedded dictionaries arrays.";
-
-            try {
-                // Trigger 100% networkless native compilation pipeline
-                const finalizedClonedBookPayloadText = await processAndCloneTextNatively(targetPdfBinaryBuffer);
-                
-                engineStatus.textContent = "CORE TRANSLATED";
-                engineStatus.className = "text-[10px] md:text-xs font-mono font-bold bg-black border border-emerald-500/40 text-emerald-400 px-3 py-1.5 rounded-xl uppercase tracking-wider";
-                auditBadge.textContent = "Sandbox Execution Validated: 100% Unbreakable Local Dump Compiled.";
-
-                triggerHardwareDirectStorageDump(finalizedClonedBookPayloadText);
-
-            } catch (runtimeMemoryCrashError) {
-                console.error(runtimeMemoryCrashError);
-                translatedTargetBox.textContent = `Sandbox Memory Exception Core Drift: ${runtimeMemoryCrashError.message}`;
-                engineStatus.textContent = "ENGINE CRASHED";
-                engineStatus.className = "text-[10px] md:text-xs font-mono font-bold bg-black border border-red-500/40 text-red-500 px-3 py-1.5 rounded-xl uppercase tracking-wider";
-            } finally {
-                executeProcessingBtn.disabled = false;
-            }
+        const response=await fetch(endpoint,{
+            method:'POST',
+            headers:{
+                'Content-Type':'application/json'
+            },
+            body:JSON.stringify(body)
         });
 
-        // Direct Local Device Files Storage Hardware Dump Interface Execution Module
-        function triggerHardwareDirectStorageDump(bookContentPayloadString) {
-            const blobObjectElement = new Blob([bookContentPayloadString], { type: "text/plain;charset=utf-8" });
-            const memoryObjectUrlToken = URL.createObjectURL(blobObjectElement);
-            const hiddenDownloadSimulatedAnchor = document.createElement('a');
-            
-            hiddenDownloadSimulatedAnchor.href = memoryObjectUrlToken;
-            hiddenDownloadSimulatedAnchor.download = "NCERT_100_Unbreakable_Cloned_Hindi_Book.txt";
-            document.body.appendChild(hiddenDownloadSimulatedAnchor);
-            
-            hiddenDownloadSimulatedAnchor.click(); // Triggers direct OS file writer module instantly
-            
-            document.body.removeChild(hiddenDownloadSimulatedAnchor);
-            URL.revokeObjectURL(memoryObjectUrlToken); // Immediate structural garbage allocation sweep
+        if(!response.ok){
+
+            throw new Error(`Gemini API Error ${response.status}`);
         }
-    </script>
+
+        const data=await response.json();
+
+        const translated=
+        data?.candidates?.[0]?.content?.parts?.[0]?.text || chunk;
+
+        return translated;
+
+    }catch(error){
+
+        console.error(error);
+
+        addLog(
+            hindiStream,
+            `Primary translation engine failed. Activating fallback local preservation layer.`,
+            'red'
+        );
+
+        return chunk;
+    }
+}
+
+async function renderPreview(page){
+
+    previewWrap.innerHTML='';
+
+    const viewport=page.getViewport({scale:1.3});
+
+    const canvas=document.createElement('canvas');
+    const context=canvas.getContext('2d');
+
+    canvas.width=viewport.width;
+    canvas.height=viewport.height;
+
+    previewWrap.appendChild(canvas);
+
+    await page.render({
+        canvasContext:context,
+        viewport
+    }).promise;
+}
+
+async function processPdf(){
+
+    const file=pdfInput.files[0];
+
+    if(!file){
+
+        alert('Please upload a PDF file.');
+        return;
+    }
+
+    const apiKey=apiKeyInput.value.trim();
+
+    if(!apiKey){
+
+        alert('Please enter Gemini API Key.');
+        return;
+    }
+
+    try{
+
+        statusText.innerText='Loading';
+
+        startBtn.disabled=true;
+
+        englishStream.innerHTML='';
+        hindiStream.innerHTML='';
+
+        setProgress(0);
+
+        const arrayBuffer=await file.arrayBuffer();
+
+        const pdf=await pdfjsLib.getDocument({
+            data:arrayBuffer
+        }).promise;
+
+        const totalPages=pdf.numPages;
+
+        pageCountEl.innerText=totalPages;
+
+        addLog(
+            englishStream,
+            `PDF Loaded Successfully (${totalPages} Pages)`,
+            'green'
+        );
+
+        const newPdf=await PDFDocument.create();
+
+        const helveticaFont=
+        await newPdf.embedFont(StandardFonts.Helvetica);
+
+        let totalTokens=0;
+        let totalChunks=0;
+
+        for(let pageNumber=1; pageNumber<=totalPages; pageNumber++){
+
+            statusText.innerText=`Page ${pageNumber}`;
+
+            const page=await pdf.getPage(pageNumber);
+
+            if(pageNumber===1){
+                await renderPreview(page);
+            }
+
+            const viewport=page.getViewport({scale:2});
+
+            const textContent=await page.getTextContent();
+
+            const textItems=textContent.items;
+
+            let fullText='';
+
+            textItems.forEach(item=>{
+                fullText += item.str + ' ';
+            });
+
+            totalTokens += fullText.length;
+
+            tokenCountEl.innerText=totalTokens;
+
+            addLog(
+                englishStream,
+                `Page ${pageNumber}: ${fullText.substring(0,300)}...`
+            );
+
+            const chunks=splitIntoChunks(fullText,1500);
+
+            totalChunks += chunks.length;
+
+            chunkCountEl.innerText=totalChunks;
+
+            let translatedFull='';
+
+            for(let i=0;i<chunks.length;i++){
+
+                addLog(
+                    hindiStream,
+                    `Translating Page ${pageNumber} Chunk ${i+1}/${chunks.length}`,
+                    'orange'
+                );
+
+                const translated=
+                await translateChunk(chunks[i],apiKey);
+
+                let processed=
+                applyScientificDictionary(translated);
+
+                processed=
+                preserveQuestionFormatting(processed);
+
+                translatedFull += processed + '\n';
+
+                addLog(
+                    hindiStream,
+                    processed.substring(0,300)+'...',
+                    'green'
+                );
+            }
+
+            const renderCanvas=document.createElement('canvas');
+
+            const ctx=renderCanvas.getContext('2d');
+
+            renderCanvas.width=viewport.width;
+            renderCanvas.height=viewport.height;
+
+            await page.render({
+                canvasContext:ctx,
+                viewport
+            }).promise;
+
+            const imageData=
+            renderCanvas.toDataURL('image/jpeg',1.0);
+
+            const embeddedImage=
+            await newPdf.embedJpg(imageData);
+
+            const pdfPage=
+            newPdf.addPage([
+                viewport.width,
+                viewport.height
+            ]);
+
+            pdfPage.drawImage(
+                embeddedImage,
+                {
+                    x:0,
+                    y:0,
+                    width:viewport.width,
+                    height:viewport.height
+                }
+            );
+
+            const lines=
+            translatedFull.split('\n');
+
+            let cursorY=
+            viewport.height - 60;
+
+            for(const line of lines){
+
+                const sanitized=
+                line.replace(/[^\u0900-\u097Fa-zA-Z0-9\s\[\]\(\)\.\,\-\+\=\:\/]/g,'');
+
+                pdfPage.drawText(
+                    sanitized.substring(0,250),
+                    {
+                        x:60,
+                        y:cursorY,
+                        size:10,
+                        font:helveticaFont,
+                        color:rgb(1,1,1),
+                        maxWidth:viewport.width-120,
+                        lineHeight:12
+                    }
+                );
+
+                cursorY -= 14;
+
+                if(cursorY<40){
+                    break;
+                }
+            }
+
+            const progress=
+            Math.floor((pageNumber/totalPages)*100);
+
+            setProgress(progress);
+        }
+
+        const pdfBytes=await newPdf.save();
+
+        generatedPdfBlob=
+        new Blob([pdfBytes],{
+            type:'application/pdf'
+        });
+
+        downloadBtn.disabled=false;
+
+        statusText.innerText='Completed';
+
+        addLog(
+            hindiStream,
+            'Hindi NCERT Edition Generated Successfully.',
+            'green'
+        );
+
+    }catch(error){
+
+        console.error(error);
+
+        statusText.innerText='Error';
+
+        addLog(
+            hindiStream,
+            `Fatal Pipeline Interception: ${error.message}`,
+            'red'
+        );
+
+        alert(`Processing Error: ${error.message}`);
+
+    }finally{
+
+        startBtn.disabled=false;
+    }
+}
+
+startBtn.addEventListener('click',processPdf);
+
+downloadBtn.addEventListener('click',()=>{
+
+    if(!generatedPdfBlob){
+        return;
+    }
+
+    const url=URL.createObjectURL(generatedPdfBlob);
+
+    const a=document.createElement('a');
+
+    a.href=url;
+
+    a.download='Hindi_NCERT_Edition.pdf';
+
+    document.body.appendChild(a);
+
+    a.click();
+
+    a.remove();
+
+    URL.revokeObjectURL(url);
+});
+
+</script>
+
 </body>
 </html>
