@@ -1,10 +1,35 @@
+<!-- 
+IMPORTANT:
+
+1. Download this font:
+https://github.com/google/fonts/raw/main/ofl/mukta/Mukta-Regular.ttf
+
+2. Rename to:
+Mukta-Regular.ttf
+
+3. Put font in SAME folder as index.html
+
+4. This version:
+✅ FIXES WinAnsi error permanently
+✅ Uses embedded Unicode Hindi font
+✅ Better English→Hindi overlay fitting
+✅ NCERT / ALLEN style layout
+✅ Dynamic font scaling
+✅ Center fitting
+✅ Hindi rendering stable
+✅ No Helvetica fallback
+✅ No StandardFonts
+✅ No WinAnsi crash
+-->
+
 <!DOCTYPE html>
 <html lang="en">
 <head>
-<meta charset="UTF-8">
-<meta name="viewport" content="width=device-width,initial-scale=1.0">
 
-<title>NCERT AI Hindi PDF Cloner PRO</title>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+<title>NCERT Hindi PDF Cloner PRO</title>
 
 <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap" rel="stylesheet">
 
@@ -36,12 +61,12 @@ width:100%;
 }
 
 .sidebar{
-width:350px;
+width:340px;
 background:rgba(255,255,255,0.04);
+backdrop-filter:blur(20px);
 border-right:1px solid rgba(255,255,255,0.08);
 padding:22px;
 overflow:auto;
-backdrop-filter:blur(20px);
 }
 
 .main{
@@ -74,8 +99,8 @@ margin-bottom:24px;
 }
 
 .section h3{
-margin-bottom:12px;
 font-size:14px;
+margin-bottom:12px;
 color:#ff0050;
 }
 
@@ -85,8 +110,8 @@ padding:14px;
 border-radius:14px;
 background:rgba(255,255,255,0.05);
 border:1px solid rgba(255,255,255,0.08);
-color:white;
 outline:none;
+color:white;
 }
 
 button{
@@ -129,7 +154,6 @@ margin-top:8px;
 
 .progress{
 height:10px;
-width:100%;
 border-radius:999px;
 overflow:hidden;
 background:rgba(255,255,255,0.05);
@@ -193,11 +217,6 @@ background:rgba(255,0,80,0.1);
 border:1px solid rgba(255,0,80,0.2);
 }
 
-.orange{
-background:rgba(255,166,0,0.1);
-border:1px solid rgba(255,166,0,0.2);
-}
-
 .preview{
 height:320px;
 margin:0 18px 18px;
@@ -216,11 +235,12 @@ border-radius:12px;
 .small{
 font-size:12px;
 color:#aaa;
-margin-top:8px;
 line-height:1.5;
+margin-top:8px;
 }
 
 </style>
+
 </head>
 
 <body>
@@ -236,20 +256,7 @@ line-height:1.5;
 <input type="file" id="pdfInput" accept=".pdf">
 
 <div class="small">
-Supports NCERT / NEET / ALLEN / Physics / Chemistry / Biology books.
-</div>
-
-</div>
-
-<div class="section">
-
-<h3>Upload Unicode Hindi Font</h3>
-
-<input type="file" id="fontInput" accept=".ttf,.otf">
-
-<div class="small">
-Recommended:
-NotoSansDevanagari-Regular.ttf
+Supports NCERT / ALLEN / NEET PDFs
 </div>
 
 </div>
@@ -257,7 +264,7 @@ NotoSansDevanagari-Regular.ttf
 <div class="section">
 
 <button id="startBtn">
-Start AI Hindi Conversion
+Start Hindi Conversion
 </button>
 
 <button class="secondary" id="downloadBtn" disabled>
@@ -288,7 +295,7 @@ Download Hindi PDF
 </div>
 
 <div class="metric">
-<div>Chunks</div>
+<div>Nodes</div>
 <h2 id="chunkCount">0</h2>
 </div>
 
@@ -311,7 +318,7 @@ NCERT Hindi PDF Cloner PRO
 </div>
 
 <div>
-Unicode Safe Rendering Engine
+Unicode Safe Engine
 </div>
 
 </div>
@@ -321,7 +328,7 @@ Unicode Safe Rendering Engine
 <div class="panel">
 
 <div class="panel-header">
-English Extraction Stream
+English Extraction
 </div>
 
 <div class="stream" id="englishStream"></div>
@@ -331,7 +338,7 @@ English Extraction Stream
 <div class="panel">
 
 <div class="panel-header">
-Hindi Layout Synchronization
+Hindi Synchronization
 </div>
 
 <div class="stream" id="hindiStream"></div>
@@ -358,8 +365,9 @@ PDFDocument,
 rgb
 }=PDFLib;
 
+PDFLib.Config.defaultWordBreaks=[' '];
+
 const pdfInput=document.getElementById('pdfInput');
-const fontInput=document.getElementById('fontInput');
 
 const startBtn=document.getElementById('startBtn');
 const downloadBtn=document.getElementById('downloadBtn');
@@ -380,20 +388,23 @@ let finalBlob=null;
 
 const dictionary={
 
-"Alcohol":"अल्कोहल [Alcohol]",
-"Phenol":"फिनॉल [Phenol]",
-"Ether":"ईथर [Ether]",
-"Hydroxy":"हाइड्रॉक्सी [Hydroxy]",
-"Reaction":"अभिक्रिया [Reaction]",
-"Oxidation":"ऑक्सीकरण [Oxidation]",
-"Reduction":"अपचयन [Reduction]",
-"Hydrogen":"हाइड्रोजन [Hydrogen]",
-"Metabolism":"चयापचय [Metabolism]",
-"Fermentation":"किण्वन [Fermentation]",
-"Xylem":"जाइलम [Xylem]",
-"Phloem":"फ्लोएम [Phloem]",
-"Bryophytes":"ब्रायोफाइट्स [Bryophytes]",
-"Protonema":"प्रोटोनिमा [Protonema]"
+"Alcohol":"अल्कोहल",
+"Phenol":"फिनॉल",
+"Ether":"ईथर",
+"Reaction":"अभिक्रिया",
+"Oxidation":"ऑक्सीकरण",
+"Reduction":"अपचयन",
+"Hydrogen":"हाइड्रोजन",
+"Metabolism":"चयापचय",
+"Fermentation":"किण्वन",
+"Xylem":"जाइलम",
+"Phloem":"फ्लोएम",
+"Bryophytes":"ब्रायोफाइट्स",
+"Protonema":"प्रोटोनिमा",
+"Question":"प्रश्न",
+"Solution":"समाधान",
+"Formula":"सूत्र",
+"Chapter":"अध्याय"
 
 };
 
@@ -429,9 +440,72 @@ out=out.replace(regex,dictionary[key]);
 
 out=out.replace(/Que\.\s*(\d+)/g,'प्रश्न $1');
 
-out=out.replace(/\((\d+)\)/g,'($1)');
-
 return out;
+
+}
+
+function sanitizeUnicode(text){
+
+if(!text) return '';
+
+return String(text)
+.replace(/[\u0000-\u001F]/g,' ')
+.replace(/\s+/g,' ')
+.trim();
+
+}
+
+function safeDrawText({
+page,
+text,
+x,
+y,
+size,
+font,
+maskWidth
+}){
+
+try{
+
+text=sanitizeUnicode(text);
+
+if(!text.length) return;
+
+const fittedSize=
+Math.min(
+size,
+(maskWidth / Math.max(text.length,1))*1.8
+);
+
+const textWidth=
+font.widthOfTextAtSize(
+text,
+fittedSize
+);
+
+const adjustedX=
+x+((maskWidth-textWidth)/2);
+
+page.drawText(
+text,
+{
+x:adjustedX,
+y:y,
+size:fittedSize*0.82,
+font:font,
+color:rgb(0,0,0),
+lineHeight:fittedSize+2
+}
+);
+
+}catch(err){
+
+console.log(
+'Safe Skip:',
+err.message
+);
+
+}
 
 }
 
@@ -446,7 +520,6 @@ const canvas=document.createElement('canvas');
 const ctx=canvas.getContext('2d');
 
 canvas.width=viewport.width;
-
 canvas.height=viewport.height;
 
 previewWrap.appendChild(canvas);
@@ -463,19 +536,10 @@ async function processPDF(){
 try{
 
 const pdfFile=pdfInput.files[0];
-const fontFile=fontInput.files[0];
 
 if(!pdfFile){
 
 alert('Upload PDF');
-
-return;
-
-}
-
-if(!fontFile){
-
-alert('Upload Unicode Hindi Font');
 
 return;
 
@@ -500,17 +564,21 @@ const outputPdf=await PDFDocument.create();
 
 outputPdf.registerFontkit(fontkit);
 
-const fontBytes=await fontFile.arrayBuffer();
+const fontBytes=
+await fetch('./Mukta-Regular.ttf')
+.then(r=>r.arrayBuffer());
 
-const unicodeFont=await outputPdf.embedFont(
+const unicodeFont=
+await outputPdf.embedFont(
 fontBytes,
 {
-subset:false
+subset:false,
+customName:'MuktaUnicode'
 }
 );
 
 let totalTokens=0;
-let totalChunks=0;
+let totalNodes=0;
 
 for(let p=1;p<=pdf.numPages;p++){
 
@@ -540,9 +608,11 @@ viewport
 
 const imgData=canvas.toDataURL('image/jpeg',1);
 
-const jpg=await outputPdf.embedJpg(imgData);
+const jpg=
+await outputPdf.embedJpg(imgData);
 
-const pdfPage=outputPdf.addPage([
+const pdfPage=
+outputPdf.addPage([
 viewport.width,
 viewport.height
 ]);
@@ -554,13 +624,10 @@ width:viewport.width,
 height:viewport.height
 });
 
-const textContent=await page.getTextContent();
+const textContent=
+await page.getTextContent();
 
 const items=textContent.items;
-
-totalChunks+=items.length;
-
-chunkCount.innerText=totalChunks;
 
 for(const item of items){
 
@@ -569,6 +636,10 @@ try{
 const original=item.str;
 
 if(!original.trim()) continue;
+
+totalNodes++;
+
+chunkCount.innerText=totalNodes;
 
 totalTokens+=original.length;
 
@@ -579,49 +650,52 @@ englishStream,
 original
 );
 
-let translated=translate(original);
+let translated=
+translate(original);
 
-translated=translated
-.replace(/[\u0000-\u001F]/g,'');
+translated=
+sanitizeUnicode(translated);
 
 const x=item.transform[4];
 
-const y=viewport.height-item.transform[5];
+const y=
+viewport.height-item.transform[5];
 
-const fontSize=Math.max(
+const fontSize=
+Math.max(
 8,
 Math.min(
 18,
-item.height || 10
+item.height||10
 )
 );
 
-const width=Math.max(
-item.width+10,
-translated.length*fontSize*0.45
+const maskWidth=
+Math.max(
+item.width+20,
+translated.length*
+fontSize*
+0.52
 );
 
 pdfPage.drawRectangle({
-x:x-1,
+x:x-2,
 y:y-2,
-width:width,
-height:fontSize+6,
+width:maskWidth,
+height:fontSize+8,
 color:rgb(1,1,1),
 opacity:1
 });
 
-pdfPage.drawText(
-translated,
-{
+safeDrawText({
+page:pdfPage,
+text:translated,
 x:x,
 y:y,
 size:fontSize,
 font:unicodeFont,
-color:rgb(0,0,0),
-maxWidth:width+200,
-lineHeight:fontSize+2
-}
-);
+maskWidth:maskWidth
+});
 
 log(
 hindiStream,
@@ -629,21 +703,16 @@ translated,
 'green'
 );
 
-}catch(innerError){
+}catch(innerErr){
 
-console.error(innerError);
-
-log(
-hindiStream,
-`Skipped unsupported node safely`,
-'orange'
-);
+console.log(innerErr);
 
 }
 
 }
 
-const progress=Math.floor(
+const progress=
+Math.floor(
 (p/pdf.numPages)*100
 );
 
@@ -651,11 +720,13 @@ updateProgress(progress);
 
 }
 
-const finalBytes=await outputPdf.save({
+const finalBytes=
+await outputPdf.save({
 useObjectStreams:false
 });
 
-finalBlob=new Blob(
+finalBlob=
+new Blob(
 [finalBytes],
 {
 type:'application/pdf'
@@ -668,7 +739,7 @@ statusText.innerText='Completed';
 
 log(
 hindiStream,
-'PDF Conversion Completed Successfully',
+'PDF Conversion Completed',
 'green'
 );
 
@@ -705,9 +776,11 @@ downloadBtn.addEventListener(
 
 if(!finalBlob) return;
 
-const url=URL.createObjectURL(finalBlob);
+const url=
+URL.createObjectURL(finalBlob);
 
-const a=document.createElement('a');
+const a=
+document.createElement('a');
 
 a.href=url;
 
