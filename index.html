@@ -3,27 +3,26 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>REAL ADVANCE BOOK TRANSLATOR // NEET High-Fidelity Edition</title>
-    <link rel="preconnect" href="https://fonts.googleapis.com">
-    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <title>NATIVE VECTOR BOOK TRANSLATOR // NEET True MB-Size Edition</title>
     <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;600;700&family=Noto+Sans+Devanagari:wght@400;500;700&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    
     <script src="https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.174/pdf.min.js"></script>
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/html2pdf.js/0.10.1/html2pdf.bundle.min.js"></script>
+    <script src="https://unpkg.com/pdf-lib@1.17.1/dist/pdf-lib.min.js"></script>
+    <script src="https://unpkg.com/@pdf-lib/fontkit@1.1.1/dist/fontkit.umd.js"></script>
 
     <style>
         :root {
-            --bg-color: #0a0a0a;
-            --accent-color: #ff0050;
-            --accent-glow: rgba(255, 0, 80, 0.4);
-            --glass-bg: rgba(14, 14, 14, 0.85);
-            --glass-border: rgba(255, 0, 80, 0.2);
+            --bg-color: #0d0d11;
+            --accent-color: #00ffcc;
+            --accent-glow: rgba(0, 255, 204, 0.3);
+            --card-bg: rgba(20, 20, 27, 0.85);
+            --border-color: rgba(0, 255, 204, 0.15);
             --text-main: #ffffff;
-            --text-muted: #aaaaaa;
+            --text-muted: #a0a0b0;
         }
 
         * { box-sizing: border-box; margin: 0; padding: 0; }
-
         body {
             background-color: var(--bg-color);
             color: var(--text-main);
@@ -32,409 +31,282 @@
             display: flex;
             flex-direction: column;
             justify-content: space-between;
-            background-image: radial-gradient(circle at 10% 20%, rgba(255, 0, 80, 0.05) 0%, transparent 40%),
-                              radial-gradient(circle at 90% 80%, rgba(255, 0, 80, 0.04) 0%, transparent 45%);
+            background-image: radial-gradient(circle at 5% 10%, rgba(0, 255, 204, 0.04) 0%, transparent 35%);
         }
 
-        .container { width: 100%; max-width: 1100px; margin: 0 auto; padding: 30px 15px; }
-
-        header { text-align: center; margin-bottom: 30px; }
-        header .brand-tag { font-size: 0.75rem; text-transform: uppercase; letter-spacing: 3px; color: var(--accent-color); margin-bottom: 5px; font-weight: 600; }
-        header h1 { font-size: 2.2rem; font-weight: 700; text-transform: uppercase; letter-spacing: 1px; background: linear-gradient(to right, #ffffff, #ff4d88); -webkit-background-clip: text; -webkit-text-fill-color: transparent; }
+        .container { width: 100%; max-width: 900px; margin: 0 auto; padding: 40px 15px; }
+        header { text-align: center; margin-bottom: 35px; }
+        header .tag { font-size: 0.75rem; text-transform: uppercase; letter-spacing: 3px; color: var(--accent-color); font-weight: 600; }
+        header h1 { font-size: 2.3rem; font-weight: 700; margin-top: 5px; letter-spacing: 0.5px; }
         header p { color: var(--text-muted); font-size: 0.9rem; margin-top: 5px; }
 
-        .glass-card {
-            background: var(--glass-bg);
-            backdrop-filter: blur(15px);
-            -webkit-backdrop-filter: blur(15px);
-            border: 1px solid var(--glass-border);
-            border-radius: 12px;
-            padding: 25px;
-            margin-bottom: 25px;
-            box-shadow: 0 12px 45px rgba(0, 0, 0, 0.7);
+        .main-card {
+            background: var(--card-bg);
+            border: 1px solid var(--border-color);
+            border-radius: 16px;
+            padding: 30px;
+            box-shadow: 0 20px 50px rgba(0, 0, 0, 0.5);
         }
 
-        /* API Key Gateway Style */
-        .api-gateway-box {
-            background: rgba(255, 0, 80, 0.03);
-            border: 1px solid rgba(255, 0, 80, 0.15);
-            border-radius: 8px;
-            padding: 15px;
-            margin-bottom: 20px;
+        .input-group { margin-bottom: 20px; }
+        label { display: block; font-size: 0.8rem; text-transform: uppercase; letter-spacing: 1px; color: var(--text-muted); margin-bottom: 8px; font-weight: 500; }
+        input[type="password"], select {
+            width: 100%; background: #07070a; border: 1px solid rgba(255,255,255,0.08); border-radius: 8px;
+            padding: 14px; color: #fff; font-size: 0.9rem; outline: none; transition: 0.2s;
         }
-        .api-input-wrapper { display: flex; gap: 10px; margin-top: 8px; }
-        .api-input-wrapper input {
-            flex: 1; background: #000; border: 1px solid var(--glass-border); border-radius: 6px;
-            padding: 12px; color: #fff; font-size: 0.85rem; outline: none; transition: 0.2s;
+        input[type="password"]:focus, select:focus { border-color: var(--accent-color); box-shadow: 0 0 10px var(--accent-glow); }
+
+        .drop-zone {
+            border: 2px dashed rgba(0, 255, 204, 0.2); border-radius: 12px; padding: 45px 20px;
+            text-align: center; cursor: pointer; background: rgba(0,0,0,0.2); transition: 0.2s; position: relative;
         }
-        .api-input-wrapper input:focus { border-color: var(--accent-color); box-shadow: 0 0 8px var(--accent-glow); }
-
-        .upload-zone {
-            border: 2px dashed rgba(255, 0, 80, 0.25); border-radius: 10px; padding: 40px 20px;
-            text-align: center; cursor: pointer; position: relative; background: rgba(0, 0, 0, 0.4); transition: 0.2s;
-        }
-        .upload-zone:hover, .upload-zone.dragover { border-color: var(--accent-color); background: rgba(255, 0, 80, 0.05); }
-        .upload-zone i { font-size: 3rem; color: var(--accent-color); margin-bottom: 12px; text-shadow: 0 0 15px var(--accent-glow); }
-        .upload-zone input[type="file"] { position: absolute; top: 0; left: 0; width: 100%; height: 100%; opacity: 0; cursor: pointer; }
-
-        .file-status-pill { display: inline-block; margin-top: 12px; font-size: 0.8rem; padding: 6px 15px; border-radius: 20px; background: rgba(0, 255, 204, 0.08); color: #00ffcc; border: 1px solid rgba(0, 255, 204, 0.2); display: none; }
-
-        .control-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 15px; margin-top: 20px; }
-        @media (max-width: 600px) { .control-grid { grid-template-columns: 1fr; } }
-        .control-wrapper { display: flex; flex-direction: column; }
-        label { font-size: 0.75rem; color: var(--text-muted); margin-bottom: 6px; text-transform: uppercase; letter-spacing: 1px; font-weight: 500; }
-        select { background: rgba(10, 10, 10, 0.95); border: 1px solid var(--glass-border); border-radius: 6px; padding: 12px; color: var(--text-main); font-size: 0.85rem; outline: none; }
+        .drop-zone:hover { border-color: var(--accent-color); background: rgba(0, 255, 204, 0.02); }
+        .drop-zone i { font-size: 3.2rem; color: var(--accent-color); margin-bottom: 15px; text-shadow: 0 0 15px var(--accent-glow); }
+        .drop-zone input[type="file"] { position: absolute; top: 0; left: 0; width: 100%; height: 100%; opacity: 0; cursor: pointer; }
+        
+        .status-pill { display: inline-block; margin-top: 15px; font-size: 0.8rem; padding: 6px 16px; border-radius: 20px; background: rgba(0, 255, 204, 0.1); color: var(--accent-color); border: 1px solid rgba(0, 255, 204, 0.2); display: none; }
 
         .btn {
-            width: 100%; background: var(--accent-color); color: var(--text-main); border: none; border-radius: 6px; padding: 15px;
-            font-size: 0.9rem; font-weight: 600; text-transform: uppercase; letter-spacing: 1.5px; cursor: pointer; transition: all 0.2s;
-            box-shadow: 0 4px 18px rgba(255, 0, 80, 0.3); margin-top: 20px; display: flex; justify-content: center; align-items: center; gap: 8px;
+            width: 100%; background: var(--accent-color); color: #000; border: none; border-radius: 8px; padding: 16px;
+            font-size: 0.95rem; font-weight: 700; text-transform: uppercase; letter-spacing: 1.5px; cursor: pointer; transition: 0.2s;
+            display: flex; justify-content: center; align-items: center; gap: 10px; margin-top: 25px;
+            box-shadow: 0 5px 20px rgba(0, 255, 204, 0.2);
         }
-        .btn:hover { background: #ff1a66; transform: translateY(-1px); box-shadow: 0 6px 22px rgba(255, 0, 80, 0.5); }
-        .btn:disabled { background: #222; color: #555; box-shadow: none; cursor: not-allowed; transform: none; }
-        .btn-secondary { background: transparent; border: 1px solid var(--accent-color); box-shadow: none; margin-top: 10px; }
-        .btn-secondary:hover { background: rgba(255, 0, 80, 0.1); }
+        .btn:hover { background: #00e6b8; transform: translateY(-1px); box-shadow: 0 8px 25px rgba(0, 255, 204, 0.4); }
+        .btn:disabled { background: #222530; color: #555866; box-shadow: none; cursor: not-allowed; transform: none; }
 
-        /* Progress Engine Display */
-        .progress-container { margin-top: 20px; display: none; }
-        .progress-track { width: 100%; height: 6px; background: rgba(255, 255, 255, 0.08); border-radius: 4px; overflow: hidden; }
-        .progress-fill { width: 0%; height: 100%; background: var(--accent-color); box-shadow: 0 0 10px var(--accent-color); transition: width 0.4s ease; }
-        .progress-metrics { display: flex; justify-content: space-between; font-size: 0.8rem; color: var(--text-muted); margin-top: 8px; }
+        /* Real Progress Metrics Console */
+        .progress-box { margin-top: 25px; display: none; }
+        .progress-track { width: 100%; height: 6px; background: rgba(255,255,255,0.05); border-radius: 4px; overflow: hidden; }
+        .progress-fill { width: 0%; height: 100%; background: var(--accent-color); box-shadow: 0 0 12px var(--accent-color); transition: width 0.3s; }
+        .progress-logs { display: flex; justify-content: space-between; font-size: 0.8rem; color: var(--text-muted); margin-top: 8px; }
 
-        /* High Fidelity PDF Workspace Viewport */
-        .preview-area { display: none; }
-        .viewport-frame { background: #1c1c1c; border-radius: 8px; height: 650px; overflow-y: auto; padding: 20px; box-shadow: inset 0 0 30px rgba(0,0,0,0.6); display: flex; flex-direction: column; align-items: center; gap: 30px; }
-        
-        /* Absolute Positioning Canvas Architecture */
-        .cloned-pdf-page { position: relative; background: #ffffff; box-shadow: 0 5px 25px rgba(0,0,0,0.5); overflow: hidden; display: block; }
-        .cloned-pdf-page canvas { display: block; width: 100%; height: 100%; }
-        .absolute-text-layer { position: absolute; top: 0; left: 0; width: 100%; height: 100%; pointer-events: none; }
-        
-        /* The Mask Overlay Box that visually covers up original English blocks cleanly */
-        .translated-mask-span {
-            position: absolute; background: #ffffff; color: #111111; white-space: pre-wrap;
-            transform-origin: top left; line-height: 1.2; font-weight: 500; display: inline-block; text-align: left;
-        }
-
-        /* Font Injection Engine Classes */
-        .font-mangal { font-family: 'Noto Sans Devanagari', Arial, sans-serif !important; }
-        .font-notosans { font-family: 'Noto Sans Devanagari', sans-serif !important; }
-
-        footer { text-align: center; padding: 25px 15px; font-size: 0.8rem; color: var(--text-muted); border-top: 1px solid rgba(255, 255, 255, 0.05); margin-top: 30px; }
-        footer span { color: #ffffff; font-weight: 500; }
+        footer { text-align: center; padding: 30px; font-size: 0.8rem; color: var(--text-muted); border-top: 1px solid rgba(255,255,255,0.03); }
+        footer span { color: var(--accent-color); font-weight: 500; }
     </style>
 </head>
 <body>
 
     <div class="container">
         <header>
-            <div class="brand-tag">Narendra Avasthi & Allen Deep-Cloner Framework</div>
-            <h1>Advance Book Translator</h1>
-            <p>High-Fidelity AI In-Place Text Replacement Engine (True PDF Layout Matching)</p>
+            <div class="tag">Native Byte-Stream Binary Editor</div>
+            <h1>Real Vector PDF Translator</h1>
+            <p>Modifies Text Layers directly inside the 13MB file preserving original quality and size</p>
         </header>
 
-        <main class="glass-card">
-            <div class="api-gateway-box">
-                <label style="color: var(--accent-color); font-weight: 600;"><i class="fa-solid fa-key"></i> Enter Gemini AI API Key (Required for Real Contextual Translation)</label>
-                <div class="api-input-wrapper">
-                    <input type="password" id="api-key-input" placeholder="Paste your AIzaSy... Gemini API Key here">
-                </div>
-                <span style="font-size: 0.7rem; color: var(--text-muted); display: block; margin-top: 5px;">Don't have one? Get a free API Key from Google AI Studio to run continuous heavy block translation layers.</span>
+        <main class="main-card">
+            <div class="input-group">
+                <label><i class="fa-solid fa-key"></i> Enter Gemini API Key</label>
+                <input type="password" id="api-key-field" placeholder="AIzaSy...">
             </div>
 
-            <div class="upload-zone" id="drop-zone">
+            <div class="drop-zone" id="drop-area">
                 <i class="fa-solid fa-file-pdf"></i>
-                <p>Drag & Drop original Book PDF here or click to select file</p>
-                <span style="font-size: 0.7rem; color: var(--text-muted);">Optimal for Narendra Avasthi Physical Chemistry & Allen Modules</span>
-                <input type="file" id="file-input" accept=".pdf">
-                <div class="file-status-pill" id="file-status-text"></div>
+                <p>Drag & Drop your Narendra Avasthi PDF here or click to browse</p>
+                <span style="font-size: 0.7rem; color: var(--text-muted);">Processes original high-resolution native layouts</span>
+                <input type="file" id="pdf-file-picker" accept=".pdf">
+                <div class="status-pill" id="upload-status"></div>
             </div>
 
-            <div class="control-grid">
-                <div class="control-wrapper">
-                    <label for="font-engine-selector">Official Textbook Font Standard</label>
-                    <select id="font-engine-selector">
-                        <option value="mangal">Mangal Font (Unicode) — Official NCERT & NEET Standard</option>
-                        <option value="notosans">Noto Sans Devanagari — Modern High-Resolution Digital Layout</option>
-                    </select>
-                </div>
-                <div class="control-wrapper">
-                    <label for="page-range-selector">Processing Boundary Limit</label>
-                    <select id="page-range-selector">
-                        <option value="5">Process First 5 Pages (Fast Diagnostic Mode)</option>
-                        <option value="10">Process First 10 Pages (Balanced Deep Processing)</option>
-                        <option value="20">Process First 20 Pages (Comprehensive Book Mode)</option>
-                    </select>
-                </div>
+            <div class="input-group" style="margin-top: 20px;">
+                <label><i class="fa-solid fa-layer-group"></i> Page Limit Configuration</label>
+                <select id="page-bounds">
+                    <option value="5">Process First 5 Pages (Fast Vector Test)</option>
+                    <option value="15">Process First 15 Pages (Heavy Analysis)</option>
+                    <option value="34">Process Full Document (All 34 Pages)</option>
+                </select>
             </div>
 
-            <button class="btn" id="translate-trigger-btn" disabled>
-                <i class="fa-solid fa-wand-magic-sparkles"></i> Translate Now (Launches Deep Parsing Matrix)
+            <button class="btn" id="exec-pipeline-btn" disabled>
+                <i class="fa-solid fa-gear fa-spin-slow"></i> Run Native Translation
             </button>
 
-            <div class="progress-container" id="progress-container">
-                <div class="progress-track"><div class="progress-fill" id="progress-fill"></div></div>
-                <div class="progress-metrics">
-                    <span id="progress-status-msg">Standing by...</span>
-                    <span id="progress-percentage">0%</span>
+            <div class="progress-box" id="tracker-display">
+                <div class="progress-track"><div class="progress-fill" id="tracker-bar"></div></div>
+                <div class="progress-logs">
+                    <span id="tracker-msg">Extracting binary structures...</span>
+                    <span id="tracker-pct">0%</span>
                 </div>
             </div>
         </main>
-
-        <section class="glass-card preview-area" id="preview-area">
-            <label style="color: #00ffcc; margin-bottom: 12px; display: flex; align-items: center; gap: 6px;">
-                <i class="fa-solid fa-file-invoice"></i> Same-To-Same Translated Book Viewport
-            </label>
-            
-            <div class="viewport-frame" id="compiled-pages-stack">
-                </div>
-
-            <button class="btn" id="download-pdf-btn">
-                <i class="fa-solid fa-download"></i> Download BOOK/PDF (Saves High-Resolution Copy)
-            </button>
-            <button class="btn btn-secondary" id="tab-bypass-btn">
-                <i class="fa-solid fa-arrow-up-right-from-square"></i> Open in New Tab (Bypass Sandboxing)
-            </button>
-        </section>
     </div>
 
-    <footer>Created by <span>Ashish</span></footer>
+    <footer>High-Fidelity Engine Architecture Template | Created by <span>Ashish</span></footer>
 
     <script>
         pdfjsLib.GlobalWorkerOptions.workerSrc = 'https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.174/pdf.worker.min.js';
 
-        const fileInput = document.getElementById('file-input');
-        const dropZone = document.getElementById('drop-zone');
-        const apiKeyInput = document.getElementById('api-key-input');
-        const fileStatusText = document.getElementById('file-status-text');
-        const translateTriggerBtn = document.getElementById('translate-trigger-btn');
-        const progressContainer = document.getElementById('progress-container');
-        const progressFill = document.getElementById('progress-fill');
-        const progressStatusMsg = document.getElementById('progress-status-msg');
-        const progressPercentage = document.getElementById('progress-percentage');
-        const previewArea = document.getElementById('preview-area');
-        const compiledPagesStack = document.getElementById('compiled-pages-stack');
-        const fontEngineSelector = document.getElementById('font-engine-selector');
-        const pageRangeSelector = document.getElementById('page-range-selector');
-        const downloadPdfBtn = document.getElementById('download-pdf-btn');
-        const tabBypassBtn = document.getElementById('tab-bypass-btn');
+        const filePicker = document.getElementById('pdf-file-picker');
+        const dropArea = document.getElementById('drop-area');
+        const uploadStatus = document.getElementById('upload-status');
+        const apiKeyField = document.getElementById('api-key-field');
+        const execPipelineBtn = document.getElementById('exec-pipeline-btn');
+        const trackerDisplay = document.getElementById('tracker-display');
+        const trackerBar = document.getElementById('tracker-bar');
+        const trackerMsg = document.getElementById('tracker-msg');
+        const trackerPct = document.getElementById('tracker-pct');
+        const pageBounds = document.getElementById('page-bounds');
 
-        let originalBinaryData = null;
-        let generatedFilenameString = "NEET_Hindi_Edition.pdf";
+        let rawPdfBytes = null;
+        let originalFileName = "Translated_Book.pdf";
 
-        // File Selection Matrix Hooks
-        fileInput.addEventListener('change', (e) => { if(e.target.files.length > 0) initFileObject(e.target.files[0]); });
-        dropZone.addEventListener('dragover', (e) => { e.preventDefault(); dropZone.classList.add('dragover'); });
-        dropZone.addEventListener('dragleave', () => dropZone.classList.remove('dragover'));
-        dropZone.addEventListener('drop', (e) => {
-            e.preventDefault(); dropZone.classList.remove('dragover');
-            if(e.dataTransfer.files.length > 0) { fileInput.files = e.dataTransfer.files; initFileObject(e.dataTransfer.files[0]); }
+        // Devanagari High-Quality Digital Vector Font Asset URL (CORS Enabled open-source repository)
+        const DEVANAGARI_FONT_URL = "https://unpkg.com/@canvas-fonts/noto-sans-devanagari@1.0.4/fonts/NotoSansDevanagari-Regular.ttf";
+
+        filePicker.addEventListener('change', (e) => { if(e.target.files.length > 0) cacheFileStream(e.target.files[0]); });
+        dropArea.addEventListener('dragover', (e) => { e.preventDefault(); dropArea.style.borderColor = "var(--accent-color)"; });
+        dropArea.addEventListener('dragleave', () => dropArea.style.borderColor = "rgba(0, 255, 204, 0.2)");
+        dropArea.addEventListener('drop', (e) => {
+            e.preventDefault();
+            if(e.dataTransfer.files.length > 0) { filePicker.files = e.dataTransfer.files; cacheFileStream(e.dataTransfer.files[0]); }
         });
 
-        function initFileObject(file) {
-            generatedFilenameString = file.name.replace(".pdf", "_Hindi_NCERT_Edition.pdf");
-            fileStatusText.innerText = `Target File Ready: ${file.name} (${(file.size/(1024*1024)).toFixed(2)} MB)`;
-            fileStatusText.style.display = "inline-block";
-            translateTriggerBtn.disabled = false;
+        function cacheFileStream(file) {
+            originalFileName = file.name.replace(".pdf", "_Real_Hindi.pdf");
+            uploadStatus.innerText = `Vector Stream Loaded: ${file.name} (${(file.size/(1024*1024)).toFixed(2)} MB)`;
+            uploadStatus.style.display = "inline-block";
+            execPipelineBtn.disabled = false;
 
             const reader = new FileReader();
-            reader.onload = function(e) { originalBinaryData = new Uint8Array(e.target.result); };
+            reader.onload = function(e) { rawPdfBytes = new Uint8Array(e.target.result); };
             reader.readAsArrayBuffer(file);
         }
 
-        // Live Deep Cloud Translation Hook Interface with Gemini LLM Engine
-        async function fetchRealAiTranslation(englishTextBlocksArray, apiKey) {
-            if (!apiKey) return null;
+        // Context-Aware Deep LLM Array Pipeline via Gemini Flash
+        async function runGeminiTranslation(textArray, apiKey) {
+            if(!apiKey) return null;
+            const prompt = `You are a professional Chemistry Professor translating Narendra Avasthi physical chemistry book for NEET.
+            Translate the following array of English strings into precise, natural scientific Hindi following official NCERT terminology.
             
-            // Filter out items that are pure numbers or structural symbols before sending to preserve bandwidth
-            const payloadPrompt = {
-                contents: [{
-                    parts: [{
-                        text: `You are an expert Educational Content Translator and Textbook Specialist for NEET exams, specializing in Narendra Avasthi Physical Chemistry and Allen Modules.
-                        Your task is to translate the provided English text into high-fidelity, error-free scientific Hindi that perfectly matches official NCERT textbook terminology.
-                        
-                        Strict Compliance Rules:
-                        1. Translate contextual educational sentences into formal textbook Hindi (e.g., "Equilibrium" -> "साम्यावस्था", "Thermodynamics" -> "ऊष्मागतिकी", "Molarity" -> "मोलरता", "Which of the following" -> "निम्नलिखित में से कौन सा").
-                        2. All mathematical equations, numbers, digits, chemical formulas (e.g., H2O, CO2, H2SO4), variables (e.g., P, V, T, x, y, k, Kc), exponents, and units (e.g., kJ/mol, atm, M, g, mL) must remain 100% UNCHANGED and preserved in standard English characters.
-                        3. Return your response ONLY as a valid JSON array of strings, where each element corresponds directly to the translated index of the input text array. Do not write any markdown code blocks, explanations, or intro text. Just the clean JSON array.
-                        
-                        Input English Array to Translate:
-                        ${JSON.stringify(englishTextBlocksArray)}`
-                    }]
-                }]
-            };
+            Strict Constraints:
+            1. Translate contextual text completely (e.g., "Calculate the following" -> "निम्नलिखित की गणना करें").
+            2. Keep ALL math equations, numbers, digits, variables (P, V, T, n, K, x), exponents (10^-3), chemical formulas (H2O, NaCl, CO2), units (kJ/mol, atm, M), and brackets 100% UNCHANGED in standard English alphanumeric characters.
+            3. Return ONLY a valid JSON array of strings matching the exact index mapping of the input. No markdown wraps, no conversational text.`;
 
             try {
                 const response = await fetch(`https://generativelanguage.googleapis.com/v1beta/models/gemini-1.5-flash:generateContent?key=${apiKey}`, {
                     method: 'POST',
                     headers: { 'Content-Type': 'application/json' },
-                    body: JSON.stringify(payloadPrompt)
+                    body: JSON.stringify({
+                        contents: [{ parts: [{ text: prompt + "\n\nInput Array:\n" + JSON.stringify(textArray) }] }]
+                    })
                 });
-                
                 const data = await response.json();
-                const cleanJsonText = data.candidates[0].content.parts[0].text.replace(/```json|```/g, '').trim();
-                return JSON.parse(cleanJsonText);
-            } catch (err) {
-                console.error("AI Node Processing Exception: ", err);
-                return null; // Fallback to original text layer if processing times out or fails
+                const rawResponseText = data.candidates[0].content.parts[0].text.replace(/```json|```/g, '').trim();
+                return JSON.parse(rawResponseText);
+            } catch(e) {
+                console.error("Gemini Frame Fault: ", e);
+                return null;
             }
         }
 
-        // Core Layout Coordinates Projection Pipeline Engine
-        translateTriggerBtn.addEventListener('click', async () => {
-            const apiKey = apiKeyInput.value.trim();
-            if (!originalBinaryData) return;
-            if (!apiKey) {
-                alert("Please input a valid Gemini AI API Key to run the real translation pipeline.");
-                return;
-            }
+        execPipelineBtn.addEventListener('click', async () => {
+            const apiKey = apiKeyField.value.trim();
+            if(!rawPdfBytes || !apiKey) { alert("Please ensure the PDF is loaded and your Gemini API Key is entered."); return; }
 
-            translateTriggerBtn.disabled = true;
-            progressContainer.style.display = "block";
-            previewArea.style.display = "none";
-            compiledPagesStack.innerHTML = "";
-
-            const highDpiRenderScale = 3.0; // Scale 3.0 renders a crisp background image layer, increasing final output file size into MBs
-            const activeFontProfileClass = "font-" + fontEngineSelector.value;
-            const maxPagesAllowed = parseInt(pageRangeSelector.value);
+            execPipelineBtn.disabled = true;
+            trackerDisplay.style.display = "block";
+            updateConsoleState(5, "Downloading high-fidelity Devanagari vector fonts...");
 
             try {
-                mutateProgressState(5, "Accessing core document cryptographic tables...");
-                const loadedPdf = await pdfjsLib.getDocument({ data: originalBinaryData }).promise;
-                const totalPages = Math.min(loadedPdf.numPages, maxPagesAllowed);
+                // Fetch the digital font binary required for custom PDF text rendering injection
+                const fontBuffer = await fetch(DEVANAGARI_FONT_URL).then(res => res.arrayBuffer());
 
-                for (let pNum = 1; pNum <= totalPages; pNum++) {
-                    const trackingPercentage = 5 + Math.round((pNum / totalPages) * 85);
-                    mutateProgressState(trackingPercentage, `Cloning structure & calling AI: Page ${pNum} of ${totalPages} (Takes up to 1 minute)...`);
+                updateConsoleState(15, "Opening target file binary byte-streams...");
+                // Initialize pdf-lib for vector structural modifications
+                const pdfDoc = await PDFLib.PDFDocument.load(rawPdfBytes);
+                pdfDoc.registerFontkit(fontkit);
+                const embeddedHindiFont = await pdfDoc.embedFont(fontBuffer);
 
-                    const page = await loadedPdf.getPage(pNum);
-                    // Match viewport logic using 1.0 base layout coordinates but render at High-DPI scale for the canvas background
-                    const baseViewport = page.getViewport({ scale: 1.0 });
-                    const renderViewport = page.getViewport({ scale: highDpiRenderScale });
+                // Initialize pdf.js for text extraction and coordinate indexing maps
+                const parsedPdf = await pdfjsLib.getDocument({ data: rawPdfBytes }).promise;
+                const totalPagesToProcess = Math.min(pdfDoc.getPageCount(), parseInt(pageBounds.value));
 
-                    const pageWrapper = document.createElement('div');
-                    pageWrapper.className = "cloned-pdf-page";
-                    pageWrapper.style.width = `${baseViewport.width}px`;
-                    pageWrapper.style.height = `${baseViewport.height}px`;
+                for(int p = 1; p <= totalPagesToProcess; p++) {
+                    const stepPct = 15 + Math.round((p / totalPagesToProcess) * 80);
+                    updateConsoleState(stepPct, `Executing Byte Modification Layer: Page ${p} of ${totalPagesToProcess} (1 min average)...`);
 
-                    // Generate clean high-resolution canvas container background image to keep original charts/lines perfectly crisp
-                    const canvas = document.createElement('canvas');
-                    canvas.width = renderViewport.width;
-                    canvas.height = renderViewport.height;
-                    canvas.style.width = `${baseViewport.width}px`;
-                    canvas.style.height = `${baseViewport.height}px`;
+                    const pdfjsPage = await parsedPdf.getPage(p);
+                    const pdfLibPage = pdfDoc.getPage(p - 1);
+                    const pageHeight = pdfLibPage.getHeight();
+
+                    const textData = await pdfjsPage.getTextContent();
                     
-                    const ctx = canvas.getContext('2d');
-                    pageWrapper.appendChild(canvas);
+                    const batchStrings = [];
+                    const batchItems = [];
 
-                    await page.render({ canvasContext: ctx, viewport: renderViewport }).promise;
-
-                    // Extract exact original coordinate boxes from text layout matrices
-                    const textContent = await page.getTextContent();
-                    const textOverlayLayer = document.createElement('div');
-                    textOverlayLayer.className = `absolute-text-layer ${activeFontProfileClass}`;
-
-                    // Group line strings to execute a batch array request to Gemini API (Optimizes processing speed and translation quality)
-                    const englishSourceStringsList = [];
-                    const operationalItemsMap = [];
-
-                    textContent.items.forEach(item => {
-                        const validatedText = item.str.trim();
-                        // Ignore pure geometric artifacts or empty lines
-                        if (validatedText.length > 0) {
-                            englishSourceStringsList.push(item.str);
-                            operationalItemsMap.push(item);
+                    textData.items.forEach(item => {
+                        if(item.str.trim().length > 0) {
+                            batchStrings.push(item.str);
+                            batchItems.push(item);
                         }
                     });
 
-                    // Send the full page text array directly to Gemini for contextual translation
-                    let translatedHindiStringsList = await fetchRealAiTranslation(englishSourceStringsList, apiKey);
-                    
-                    // Fallback layer logic in case JSON parse throws error or API quota limits trigger
-                    if (!translatedHindiStringsList || translatedHindiStringsList.length !== englishSourceStringsList.length) {
-                        translatedHindiStringsList = englishSourceStringsList; 
+                    if(batchStrings.length === 0) continue;
+
+                    // Execute batch call to AI engine for complete page context accuracy
+                    let translatedResults = await runGeminiTranslation(batchStrings, apiKey);
+                    if(!translatedResults || translatedResults.length !== batchStrings.length) {
+                        translatedResults = batchStrings; // Fallback to original text if API fails
                     }
 
-                    // Project translated chunks directly onto the coordinate map
-                    operationalItemsMap.forEach((item, index) => {
-                        const tx = pdfjsLib.Util.transform(baseViewport.transform, item.transform);
-                        const fontHeight = Math.sqrt(tx[0] * tx[0] + tx[1] * tx[1]);
-                        
-                        const textSpan = document.createElement('span');
-                        textSpan.className = "translated-mask-span";
-                        textSpan.innerText = translatedHindiStringsList[index];
+                    // Directly write modifications inside native PDF vector streams
+                    batchItems.forEach((item, idx) => {
+                        const x = item.transform[4];
+                        const y = item.transform[5]; // Native PDF coordinate origin starts from bottom-left
+                        const calculatedHeight = Math.sqrt(item.transform[0]**2 + item.transform[1]**2);
+                        const itemWidth = item.width || (item.str.length * (calculatedHeight * 0.5));
 
-                        // Absolute alignment positioning mapping directly to original file coordinates
-                        textSpan.style.left = `${tx[4]}px`;
-                        textSpan.style.top = `${tx[5] - (fontHeight * 0.95)}px`; // Baseline transformation offset adjustments
-                        textSpan.style.fontSize = `${fontHeight * 0.9}px`; // Auto-adjust bounds to prevent overlap
-                        
-                        // Mask layout rules: add 2px white-space masking padding to prevent text collision overlays
-                        if (translatedHindiStringsList[index] !== item.str) {
-                            textSpan.style.paddingRight = "2px";
-                            textSpan.style.paddingLeft = "2px";
-                        }
+                        // 1. Draw White-Out Masking Rectangle over the original English character bounds
+                        pdfLibPage.drawRectangle({
+                            x: x - 1,
+                            y: y - 2,
+                            width: itemWidth + 3,
+                            height: calculatedHeight + 4,
+                            color: PDFLib.rgb(1, 1, 1) // Clean white paint layer blocks original English completely
+                        });
 
-                        textOverlayLayer.appendChild(textSpan);
+                        // 2. Inject real Hindi text characters directly as true native vector fonts
+                        pdfLibPage.drawText(translatedResults[idx], {
+                            x: x,
+                            y: y,
+                            size: calculatedHeight * 0.85, // Scale font slightly to fit the layout bounding box safely
+                            font: embeddedHindiFont,
+                            color: PDFLib.rgb(0.08, 0.08, 0.1) // Professional dark ink
+                        });
                     });
-
-                    pageWrapper.appendChild(textOverlayLayer);
-                    compiledPagesStack.appendChild(pageWrapper);
+                    
+                    // Small cooldown token to comply with free-tier requests limit structures
+                    await new Promise(resolve => setTimeout(resolve, 800));
                 }
 
-                mutateProgressState(100, "Success! Genuine Layout-Preserved Hindi Edition compiled.");
-                previewArea.style.display = "block";
-                translateTriggerBtn.disabled = false;
-                previewArea.scrollIntoView({ behavior: 'smooth' });
+                updateConsoleState(98, "Re-serializing optimized binary matrices...");
+                // Save the vector bytes with structural compression enabled to maintain pure original quality sizes in MBs
+                const compiledPdfBytes = await pdfDoc.save({ useObjectStreams: true });
+                
+                updateConsoleState(100, "Compilation Complete! Triggering original MB file download.");
+
+                const blob = new Blob([compiledPdfBytes], { type: "application/pdf" });
+                const downloadLink = document.createElement('a');
+                downloadLink.href = URL.createObjectURL(blob);
+                downloadLink.download = originalFileName;
+                downloadLink.click();
+
+                execPipelineBtn.disabled = false;
 
             } catch (err) {
                 console.error(err);
-                mutateProgressState(0, "Pipeline Execution Failure.");
-                alert("Processing Error: Verify that your API key is active and that the uploaded file is an editable vector text PDF document.");
-                translateTriggerBtn.disabled = false;
+                updateConsoleState(0, "Vector Core Pipeline Interrupted.");
+                alert("Processing Fault: Check your network status and confirm your Gemini API key is valid.");
+                execPipelineBtn.disabled = false;
             }
         });
 
-        function mutateProgressState(percentValue, statusString) {
-            progressFill.style.width = `${percentValue}%`;
-            progressStatusMsg.innerText = statusString;
-            progressPercentage.innerText = `${percentValue}%`;
+        function updateConsoleState(percent, message) {
+            trackerBar.style.width = `${percent}%`;
+            trackerMsg.innerText = message;
+            trackerPct.innerText = `${percent}%`;
         }
-
-        // Build Multi-Page High-Fidelity Print Engine configuration
-        downloadPdfBtn.addEventListener('click', () => {
-            const pdfConfigOptions = {
-                margin:       0,
-                filename:     generatedFilenameString,
-                image:        { type: 'jpeg', quality: 0.99 },
-                html2canvas:  { scale: 1.5, useCORS: true, logging: false }, // Scale factor guarantees highly readable crisp MB output
-                jsPDF:        { unit: 'pt', format: 'a4', orientation: 'portrait' }
-            };
-            html2pdf().set(pdfConfigOptions).from(compiledPagesStack).save();
-        });
-
-        tabBypassBtn.addEventListener('click', () => {
-            const externalTab = window.open('', '_blank');
-            const documentContentMarkup = `
-                <html>
-                <head>
-                    <title>${generatedFilenameString}</title>
-                    <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+Devanagari:wght@400;700&display=swap" rel="stylesheet">
-                    <style>
-                        body { background: #515558; margin: 0; padding: 25px; display: flex; flex-direction: column; align-items: center; gap: 20px; }
-                        .cloned-pdf-page { position: relative; background: #ffffff; box-shadow: 0 4px 15px rgba(0,0,0,0.5); display: block; overflow: hidden; }
-                        .absolute-text-layer { position: absolute; top: 0; left: 0; width: 100%; height: 100%; pointer-events: none; }
-                        .translated-mask-span { position: absolute; background: #ffffff; color: #111111; white-space: pre-wrap; transform-origin: top left; line-height: 1.2; font-family: 'Noto Sans Devanagari', sans-serif; font-weight: 500; }
-                    </style>
-                </head>
-                <body>
-                    ${compiledPagesStack.innerHTML}
-                </body>
-                </html>
-            `;
-            externalTab.document.write(documentContentMarkup);
-            externalTab.document.close();
-        });
     </script>
 </body>
 </html>
