@@ -50,7 +50,7 @@
 
         .input-group { margin-bottom: 20px; }
         label { display: block; font-size: 0.8rem; text-transform: uppercase; letter-spacing: 1px; color: var(--text-muted); margin-bottom: 8px; font-weight: 500; }
-        input[type="password"], select {
+        input[type="password"], select, input[type="file"].font-picker {
             width: 100%; background: #07070a; border: 1px solid rgba(255,255,255,0.08); border-radius: 8px;
             padding: 14px; color: #fff; font-size: 0.9rem; outline: none; transition: 0.2s;
         }
@@ -62,7 +62,7 @@
         }
         .drop-zone:hover { border-color: var(--accent-color); background: rgba(0, 255, 204, 0.02); }
         .drop-zone i { font-size: 3.2rem; color: var(--accent-color); margin-bottom: 15px; text-shadow: 0 0 15px var(--accent-glow); }
-        .drop-zone input[type="file"] { position: absolute; top: 0; left: 0; width: 100%; height: 100%; opacity: 0; cursor: pointer; }
+        .drop-zone input[type="file"].pdf-input { position: absolute; top: 0; left: 0; width: 100%; height: 100%; opacity: 0; cursor: pointer; z-index: 2; }
         
         .status-pill { display: inline-block; margin-top: 15px; font-size: 0.8rem; padding: 6px 16px; border-radius: 20px; background: rgba(0, 255, 204, 0.1); color: var(--accent-color); border: 1px solid rgba(0, 255, 204, 0.2); display: none; }
 
@@ -89,7 +89,7 @@
 
     <div class="container">
         <header>
-            <div class="tag">Native Byte-Stream Binary Editor</div>
+            <div class="tag">Native Byte-Stream Binary Editor (Fixed Version)</div>
             <h1>Real Vector PDF Translator</h1>
             <p>Modifies Text Layers directly inside the 13MB file preserving original quality and size</p>
         </header>
@@ -104,8 +104,14 @@
                 <i class="fa-solid fa-file-pdf"></i>
                 <p>Drag & Drop your Narendra Avasthi PDF here or click to browse</p>
                 <span style="font-size: 0.7rem; color: var(--text-muted);">Processes original high-resolution native layouts</span>
-                <input type="file" id="pdf-file-picker" accept=".pdf">
+                <input type="file" id="pdf-file-picker" class="pdf-input" accept=".pdf">
                 <div class="status-pill" id="upload-status"></div>
+            </div>
+
+            <div class="input-group" style="margin-top: 20px;">
+                <label><i class="fa-solid fa-font"></i> Optional: Select Local Hindi TTF Font (If online fetch fails)</label>
+                <input type="file" id="local-font-picker" class="font-picker" accept=".ttf">
+                <span style="font-size: 0.7rem; color: var(--text-muted); display:block; margin-top:4px;">You can select 'mangal.ttf' or 'Nirmala.ttf' from C:/Windows/Fonts folder.</span>
             </div>
 
             <div class="input-group" style="margin-top: 20px;">
@@ -118,7 +124,7 @@
             </div>
 
             <button class="btn" id="exec-pipeline-btn" disabled>
-                <i class="fa-solid fa-gear fa-spin-slow"></i> Run Native Translation
+                <i class="fa-solid fa-gear"></i> Run Native Translation
             </button>
 
             <div class="progress-box" id="tracker-display">
@@ -137,6 +143,7 @@
         pdfjsLib.GlobalWorkerOptions.workerSrc = 'https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.174/pdf.worker.min.js';
 
         const filePicker = document.getElementById('pdf-file-picker');
+        const localFontPicker = document.getElementById('local-font-picker');
         const dropArea = document.getElementById('drop-area');
         const uploadStatus = document.getElementById('upload-status');
         const apiKeyField = document.getElementById('api-key-field');
@@ -148,12 +155,22 @@
         const pageBounds = document.getElementById('page-bounds');
 
         let rawPdfBytes = null;
+        let customFontBytes = null;
         let originalFileName = "Translated_Book.pdf";
 
-        // Devanagari High-Quality Digital Vector Font Asset URL (CORS Enabled open-source repository)
+        // Devanagari High-Quality Digital Vector Font Asset URL
         const DEVANAGARI_FONT_URL = "https://unpkg.com/@canvas-fonts/noto-sans-devanagari@1.0.4/fonts/NotoSansDevanagari-Regular.ttf";
 
         filePicker.addEventListener('change', (e) => { if(e.target.files.length > 0) cacheFileStream(e.target.files[0]); });
+        
+        localFontPicker.addEventListener('change', (e) => {
+            if(e.target.files.length > 0) {
+                const reader = new FileReader();
+                reader.onload = function(evt) { customFontBytes = evt.target.result; };
+                reader.readAsArrayBuffer(e.target.files[0]);
+            }
+        });
+
         dropArea.addEventListener('dragover', (e) => { e.preventDefault(); dropArea.style.borderColor = "var(--accent-color)"; });
         dropArea.addEventListener('dragleave', () => dropArea.style.borderColor = "rgba(0, 255, 204, 0.2)");
         dropArea.addEventListener('drop', (e) => {
@@ -206,11 +223,22 @@
 
             execPipelineBtn.disabled = true;
             trackerDisplay.style.display = "block";
-            updateConsoleState(5, "Downloading high-fidelity Devanagari vector fonts...");
+            updateConsoleState(5, "Preparing Devanagari vector fonts...");
 
             try {
-                // Fetch the digital font binary required for custom PDF text rendering injection
-                const fontBuffer = await fetch(DEVANAGARI_FONT_URL).then(res => res.arrayBuffer());
+                let fontBuffer;
+                if (customFontBytes) {
+                    fontBuffer = customFontBytes;
+                } else {
+                    try {
+                        fontBuffer = await fetch(DEVANAGARI_FONT_URL).then(res => res.arrayBuffer());
+                    } catch (fontErr) {
+                        console.error("CDN Font block detected, falling back to basic embed requirement guide.");
+                        alert("Browser Security (CORS) blocked the online font download. Please use the 'Select Local Hindi TTF Font' option below to select 'mangal.ttf' from your computer (C:/Windows/Fonts) and click run again!");
+                        execPipelineBtn.disabled = false;
+                        return;
+                    }
+                }
 
                 updateConsoleState(15, "Opening target file binary byte-streams...");
                 // Initialize pdf-lib for vector structural modifications
@@ -222,7 +250,8 @@
                 const parsedPdf = await pdfjsLib.getDocument({ data: rawPdfBytes }).promise;
                 const totalPagesToProcess = Math.min(pdfDoc.getPageCount(), parseInt(pageBounds.value));
 
-                for(int p = 1; p <= totalPagesToProcess; p++) {
+                // FIXED: 'int p' replaced with 'let p' to fix the browser compilation block error!
+                for(let p = 1; p <= totalPagesToProcess; p++) {
                     const stepPct = 15 + Math.round((p / totalPagesToProcess) * 80);
                     updateConsoleState(stepPct, `Executing Byte Modification Layer: Page ${p} of ${totalPagesToProcess} (1 min average)...`);
 
@@ -253,7 +282,7 @@
                     // Directly write modifications inside native PDF vector streams
                     batchItems.forEach((item, idx) => {
                         const x = item.transform[4];
-                        const y = item.transform[5]; // Native PDF coordinate origin starts from bottom-left
+                        const y = item.transform[5]; 
                         const calculatedHeight = Math.sqrt(item.transform[0]**2 + item.transform[1]**2);
                         const itemWidth = item.width || (item.str.length * (calculatedHeight * 0.5));
 
@@ -281,7 +310,6 @@
                 }
 
                 updateConsoleState(98, "Re-serializing optimized binary matrices...");
-                // Save the vector bytes with structural compression enabled to maintain pure original quality sizes in MBs
                 const compiledPdfBytes = await pdfDoc.save({ useObjectStreams: true });
                 
                 updateConsoleState(100, "Compilation Complete! Triggering original MB file download.");
